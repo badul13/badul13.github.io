@@ -1,0 +1,130 @@
+/* 프로필 README의 Material Brown 팔레트(#4E342E ~ #8D6E63)를 그대로 가져옴 */
+:root {
+  --bg: #1c1512;
+  --surface: #241b17;
+  --border: #3a2b24;
+  --text: #ece4df;
+  --muted: #b09b91;
+  --accent: #8d6e63;
+  --accent-soft: #6d4c41;
+  --accent-deep: #4e342e;
+  --radius: 10px;
+  --maxw: 760px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
+    'Malgun Gothic', sans-serif;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--text); }
+
+hr { border: 0; border-top: 1px solid var(--border); margin: 40px 0; }
+
+h1, h2, h3 { line-height: 1.35; }
+h2 { font-size: 1.15rem; letter-spacing: 0.02em; }
+
+.muted { color: var(--muted); }
+.small { font-size: 0.85rem; }
+
+/* 헤더 / 푸터 */
+.site-header {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 16px;
+  flex-wrap: wrap;
+}
+.brand { font-weight: 700; color: var(--text); }
+.nav { display: flex; gap: 16px; font-size: 0.9rem; }
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  margin-top: 64px;
+  padding-block: 24px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+main { padding-block: 40px; }
+
+/* 배지 — README의 shields.io 느낌 */
+.badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: #fff;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+/* 카드 */
+.cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 16px 18px;
+}
+.card h3 { margin: 0 0 6px; font-size: 1rem; }
+.card p { margin: 0 0 10px; color: var(--muted); font-size: 0.88rem; }
+
+/* 목록 */
+.entry-list { list-style: none; margin: 0; padding: 0; }
+.entry-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+}
+.entry-list time { color: var(--muted); font-size: 0.8rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* 일기 타임라인 */
+.log-entry {
+  border-left: 2px solid var(--border);
+  padding: 0 0 24px 20px;
+  margin-left: 6px;
+}
+.log-entry h3 { margin: 0 0 4px; font-size: 0.98rem; }
+.log-entry .log-body { color: var(--muted); font-size: 0.9rem; }
+
+/* 글 본문 */
+.prose { font-size: 0.96rem; }
+.prose img { max-width: 100%; }
+.prose pre {
+  background: #17110e;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  overflow-x: auto;
+}
+.prose code { font-size: 0.88em; }
+.prose blockquote {
+  border-left: 3px solid var(--accent-soft);
+  margin: 0;
+  padding-left: 14px;
+  color: var(--muted);
+}

@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+
+// TODO: 기본 description 문장
+const { title, description = '' } = Astro.props;
+const nav = [
+  { href: '/', label: 'Home' },
+  { href: '/posts', label: 'Posts' },
+  { href: '/log', label: 'Log' },
+];
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title="posts" href="/rss.xml" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="/">badul13</a>
+        <nav class="nav">
+          {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      © {new Date().getFullYear()} 정태현 · Taehyeon Jeong
+    </footer>
+  </body>
+</html>

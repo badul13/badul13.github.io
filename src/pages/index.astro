@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { projects, stack } from '../data/projects';
+
+const byDate = (a, b) => b.data.date.valueOf() - a.data.date.valueOf();
+const live = (e) => !e.data.draft;
+
+const posts = (await getCollection('posts')).filter(live).sort(byDate).slice(0, 3);
+const logs = (await getCollection('log')).filter(live).sort(byDate).slice(0, 3);
+const fmt = (d) => d.toISOString().slice(0, 10);
+---
+
+<Base title="정태현 · Taehyeon Jeong">
+  <section>
+    <h1 style="margin-bottom:4px">정태현 · Taehyeon Jeong</h1>
+    {/* TODO: 직무·소속 한 줄 */}
+    {/* TODO: 자기소개 문단 */}
+    <div class="badges">
+      {stack.map((s) => <span class="badge">{s}</span>)}
+    </div>
+  </section>
+
+  <hr />
+
+  <section>
+    <h2>Projects</h2>
+    <div class="cards">
+      {projects.map((p) => (
+        <article class="card">
+          <h3><a href={p.href}>{p.name}</a></h3>
+          <p>{p.description}</p>
+          <div class="badges">
+            {p.tags.map((t) => <span class="badge">{t}</span>)}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <hr />
+
+  <section>
+    <h2>Recent posts</h2>
+    <ul class="entry-list">
+      {posts.map((p) => (
+        <li>
+          <time datetime={fmt(p.data.date)}>{fmt(p.data.date)}</time>
+          <a href={`/posts/${p.id}/`}>{p.data.title}</a>
+        </li>
+      ))}
+    </ul>
+    <p class="small"><a href="/posts">모든 글 →</a></p>
+  </section>
+
+  <section>
+    <h2>Recent log</h2>
+    <ul class="entry-list">
+      {logs.map((l) => (
+        <li>
+          <time datetime={fmt(l.data.date)}>{fmt(l.data.date)}</time>
+          <span>{l.data.title}</span>
+        </li>
+      ))}
+    </ul>
+    <p class="small"><a href="/log">일기 전체 →</a></p>
+  </section>
+</Base>
