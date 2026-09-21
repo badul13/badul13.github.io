@@ -2,20 +2,18 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 
-// 일기는 글이 짧아서 개별 페이지 없이 한 장에 타임라인으로 쭉 쌓는다
-const logs = (await getCollection('log'))
-  .filter((l) => !l.data.draft)
+const entries = (await getCollection('study'))
+  .filter((e) => !e.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 const rendered = await Promise.all(
-  logs.map(async (l) => ({ entry: l, Content: (await render(l)).Content })),
+  entries.map(async (e) => ({ entry: e, Content: (await render(e)).Content })),
 );
 const fmt = (d) => d.toISOString().slice(0, 10);
 ---
 
-<Base title="Log · badul13">
-  <h1>Log</h1>
-  {/* TODO: 섹션 설명 한 줄 */}
+<Base title="Study · badul13">
+  <h1>Study</h1>
   <div style="margin-top:32px">
     {rendered.map(({ entry, Content }) => (
       <div class="log-entry">
@@ -24,5 +22,6 @@ const fmt = (d) => d.toISOString().slice(0, 10);
         <div class="log-body"><Content /></div>
       </div>
     ))}
+    {rendered.length === 0 && <p class="muted small">아직 기록이 없습니다.</p>}
   </div>
 </Base>

@@ -1,0 +1,44 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const pad = (n) => String(n).padStart(2, '0');
+const key = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+// 달력에서 누를 수 있는 날짜 전부 — 올해 9월 1일부터 12월 31일까지.
+export async function getStaticPaths() {
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const k = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+  const entries = (await getCollection('diary')).filter((e) => !e.data.draft);
+  const year = new Date().getFullYear();
+  const paths = [];
+  for (let month = 8; month < 12; month++) {
+    const days = new Date(year, month + 1, 0).getDate();
+    for (let i = 1; i <= days; i++) {
+      const date = new Date(year, month, i);
+      paths.push({
+        params: { date: k(date) },
+        props: { entry: entries.find((e) => k(e.data.date) === k(date)) ?? null },
+      });
+    }
+  }
+  return paths;
+}
+
+const { entry } = Astro.props;
+const { date } = Astro.params;
+const Content = entry ? (await render(entry)).Content : null;
+---
+
+<Base title={`${date} · 일기`}>
+  <p class="muted small"><a href="/diary">← 달력</a></p>
+  <h1>{date}</h1>
+  {entry ? (
+    <div class="log-body" style="margin-top:24px">
+      <h2>{entry.data.title}</h2>
+      <Content />
+    </div>
+  ) : (
+    <p class="muted small" style="margin-top:24px">이 날은 기록이 없습니다.</p>
+  )}
+</Base>

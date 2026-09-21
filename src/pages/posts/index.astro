@@ -6,16 +6,23 @@ const posts = (await getCollection('posts'))
   .filter((p) => !p.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const fmt = (d) => d.toISOString().slice(0, 10);
+const readMin = (e) => Math.max(1, Math.round((e.body?.length ?? 0) / 500));
 ---
 
 <Base title="Posts · badul13">
   <h1>Posts</h1>
-  <ul class="entry-list">
+  <ul class="list">
     {posts.map((p) => (
-      <li>
-        <time datetime={fmt(p.data.date)}>{fmt(p.data.date)}</time>
-        <a href={`/posts/${p.id}/`}>{p.data.title}</a>
-      </li>
+      <li><a href={`/posts/${p.id}/`}>
+        <span class="t">{p.data.title}</span>
+        {p.data.summary && <span class="s">{p.data.summary}</span>}
+        <span class="li-meta">
+          <time>{fmt(p.data.date)}</time>
+          <span class="tags">{p.data.tags.join(' / ')}</span>
+          <span class="min">{readMin(p)} min</span>
+        </span>
+      </a></li>
     ))}
   </ul>
+  {posts.length === 0 && <p class="empty">아직 글이 없습니다.</p>}
 </Base>

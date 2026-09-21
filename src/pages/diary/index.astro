@@ -1,0 +1,46 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const entries = (await getCollection('diary')).filter((e) => !e.data.draft);
+
+const pad = (n) => String(n).padStart(2, '0');
+const key = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+// 올해 9월부터 12월까지. 글이 없는 달도 자리를 비워 둔다.
+const YEAR = new Date().getFullYear();
+const FIRST_MONTH = 8; // 0-based — 9월
+// 칸 수를 6주(42칸)로 맞춰야 달마다 높이가 같아져서 줄이 어긋나지 않는다.
+const months = Array.from({ length: 4 }, (_, i) => {
+  const month = FIRST_MONTH + i;
+  const cells = [
+    ...Array.from({ length: new Date(YEAR, month, 1).getDay() }, () => null),
+    ...Array.from({ length: new Date(YEAR, month + 1, 0).getDate() }, (_, i) => new Date(YEAR, month, i + 1)),
+  ];
+  while (cells.length < 42) cells.push(null);
+  return { year: YEAR, month, cells };
+});
+
+const written = new Set(entries.map((e) => key(e.data.date)));
+const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+---
+
+<Base title="Diary · badul13">
+  <h1>Diary</h1>
+
+  <div class="cal-year">
+    {months.map((m) => (
+      <section class="cal">
+        <h2>{m.year}. {pad(m.month + 1)}</h2>
+        <div class="cal-grid">
+          {WEEKDAYS.map((w) => <span class="cal-head">{w}</span>)}
+          {m.cells.map((d) => (
+            d === null
+              ? <span class="cal-cell empty"></span>
+              : <a class={written.has(key(d)) ? 'cal-cell has' : 'cal-cell'} href={`/diary/${key(d)}/`}>{d.getDate()}</a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</Base>

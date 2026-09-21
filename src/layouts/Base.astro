@@ -1,41 +1,59 @@
 ---
 import '../styles/global.css';
 
-// TODO: 기본 description 문장
+// 메인(index.astro)과 같은 껍데기를 쓴다 — 네비, 왼쪽 프로필, 본문 폭, 푸터가 전부 같다.
 const { title, description = '' } = Astro.props;
 const nav = [
-  { href: '/', label: 'Home' },
+  { href: '/#content', label: 'Home' },
   { href: '/posts', label: 'Posts' },
-  { href: '/log', label: 'Log' },
+  { href: '/study', label: 'Study' },
+  { href: '/work', label: 'Work' },
+  { href: '/diary', label: 'Diary' },
 ];
+const path = Astro.url.pathname;
+const active = (href) => href !== '/#content' && path.startsWith(href);
 ---
 
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="paper">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title="posts" href="/rss.xml" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
     <title>{title}</title>
   </head>
   <body>
-    <header class="site-header">
-      <div class="wrap">
-        <a class="brand" href="/">badul13</a>
-        <nav class="nav">
-          {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+    <header class="nav">
+      <div class="nav-in">
+        <nav class="menu">
+          {nav.map((n) => <a href={n.href} class={active(n.href) ? 'on' : undefined}>{n.label}</a>)}
         </nav>
       </div>
     </header>
 
-    <main class="wrap">
-      <slot />
-    </main>
+    <div class="content">
+      <aside class="side">
+        <img class="pfp" src="/art/avatar.jpg" width="60" height="60" alt="정태현" />
+        <div>
+          <h2>정태현</h2>
+          <p class="role">열심히 하고 싶은 청년</p>
+          <div class="links">
+            <a href="https://github.com/badul13">GitHub</a><span class="dotsep"></span
+            ><a href="mailto:badul13@users.noreply.github.com">Mail</a>
+          </div>
+        </div>
+      </aside>
 
-    <footer class="site-footer">
-      © {new Date().getFullYear()} 정태현 · Taehyeon Jeong
-    </footer>
+      <main>
+        <slot />
+
+        <footer class="foot">
+          <span class="dots" aria-hidden="true"></span>© Taehyeon Jeong | {new Date().getFullYear()}
+        </footer>
+      </main>
+    </div>
   </body>
 </html>

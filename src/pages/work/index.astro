@@ -1,0 +1,27 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const entries = (await getCollection('work'))
+  .filter((e) => !e.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const rendered = await Promise.all(
+  entries.map(async (e) => ({ entry: e, Content: (await render(e)).Content })),
+);
+const fmt = (d) => d.toISOString().slice(0, 10);
+---
+
+<Base title="Work · badul13">
+  <h1>Work</h1>
+  <div style="margin-top:32px">
+    {rendered.map(({ entry, Content }) => (
+      <div class="log-entry">
+        <time class="muted small" datetime={fmt(entry.data.date)}>{fmt(entry.data.date)}</time>
+        <h3>{entry.data.title}</h3>
+        <div class="log-body"><Content /></div>
+      </div>
+    ))}
+    {rendered.length === 0 && <p class="muted small">아직 기록이 없습니다.</p>}
+  </div>
+</Base>

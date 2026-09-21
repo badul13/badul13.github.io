@@ -1,130 +1,188 @@
-/* 프로필 README의 Material Brown 팔레트(#4E342E ~ #8D6E63)를 그대로 가져옴 */
-:root {
-  --bg: #1c1512;
-  --surface: #241b17;
-  --border: #3a2b24;
-  --text: #ece4df;
-  --muted: #b09b91;
-  --accent: #8d6e63;
-  --accent-soft: #6d4c41;
-  --accent-deep: #4e342e;
-  --radius: 10px;
-  --maxw: 760px;
+/* 사이트 전체가 같은 껍데기를 쓴다 — 메인과 서브 페이지의 네비·프로필·본문 폭·타이포가 같다.
+   색은 프로필 README의 Material Brown 팔레트를 종이(paper) 배경 위로 옮긴 것. */
+:root,
+:root[data-theme='paper'] {
+  --bg: #f3eee9;
+  --surface: #efe7e0;
+  --border: #e0d5cb;
+  --hair: rgba(59, 42, 36, 0.07);
+  --text: #3b2a24;
+  --muted: #7a6559;
+  --faint: #a79385;
+  --accent: #8a5a3b;
+  --accent-soft: #b08968;
 }
 
 * { box-sizing: border-box; }
+
+/* 스크롤바가 있는 페이지와 없는 페이지의 가로 폭이 달라지면 네비가 미묘하게 어긋난다.
+   자리를 항상 비워 둬서 메인과 서브가 같은 위치에 오게 한다. */
+html { scrollbar-gutter: stable; }
 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
-    'Malgun Gothic', sans-serif;
-  line-height: 1.7;
+  font-family: Pretendard, -apple-system, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  font-size: 15.5px;
+  line-height: 1.75;
   -webkit-font-smoothing: antialiased;
 }
-
-.wrap {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
+svg { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { color: var(--text); }
 
-hr { border: 0; border-top: 1px solid var(--border); margin: 40px 0; }
+/* ── 네비 ─────────────────────────────────────────────── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--bg) 92%, transparent) 0%,
+    color-mix(in oklab, var(--bg) 70%, transparent) 62%,
+    transparent 100%);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
+}
+.nav-in {
+  max-width: 1180px; margin: 0 auto; height: 68px; padding: 0 32px;
+  display: flex; align-items: center; justify-content: flex-end; gap: 24px;
+}
+.menu { display: flex; gap: 24px; }
+.menu a { color: var(--muted); text-decoration: none; font-size: 13.5px; transition: color .18s; }
+.menu a:hover { color: var(--text); }
+.menu a.on { color: var(--accent); }
 
-h1, h2, h3 { line-height: 1.35; }
-h2 { font-size: 1.15rem; letter-spacing: 0.02em; }
+/* ── 본문 뼈대: 왼쪽 프로필 + 오른쪽 내용 ──────────────── */
+.content {
+  position: relative; z-index: 2; max-width: 1180px; margin: 0 auto;
+  padding: 120px 32px 140px;
+  display: grid; grid-template-columns: 248px 1fr; gap: 72px; align-items: start;
+}
+.side { position: sticky; top: 104px; display: flex; flex-direction: column; gap: 16px; }
+.pfp { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; display: block; }
+.side h2 { margin: 0; font-size: 18px; font-weight: 620; letter-spacing: -0.01em; }
+.role { margin: 7px 0 16px; font-size: 13.5px; line-height: 1.6; color: var(--muted); }
+.links { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.links a { color: var(--muted); text-decoration: none; transition: color .18s; }
+.links a:hover { color: var(--accent); }
+.dotsep { width: 3px; height: 3px; background: var(--faint); }
 
+main { min-width: 0; }
+main section { margin-bottom: 72px; }
+
+h1 { margin: 0 0 28px; font-size: 26px; font-weight: 680; letter-spacing: -0.02em; }
+h3 {
+  display: flex; align-items: center; gap: 9px; margin: 0 0 18px;
+  font-size: 11.5px; letter-spacing: .26em; text-transform: uppercase;
+  color: var(--faint); font-weight: 600;
+}
+.h3-note {
+  margin-left: 10px; letter-spacing: 0; text-transform: none;
+  font-size: 11.5px; font-weight: 400; color: var(--faint); opacity: .8;
+}
+.mk { width: 5px; height: 5px; background: var(--accent); }
+.mk.dim { background: var(--faint); }
 .muted { color: var(--muted); }
-.small { font-size: 0.85rem; }
+.small { font-size: 13px; }
 
-/* 헤더 / 푸터 */
-.site-header {
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+/* ── 목록 ─────────────────────────────────────────────── */
+.list { list-style: none; margin: 0; padding: 0; }
+.list a {
+  position: relative; display: block; padding: 24px 0 25px 20px;
+  text-decoration: none; color: var(--text); transition: padding-left .22s;
 }
-.site-header .wrap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-block: 16px;
-  flex-wrap: wrap;
+.list li + li a { box-shadow: 0 -1px 0 var(--hair); }
+.list a:hover { padding-left: 24px; }
+.t { display: block; font-size: 21px; font-weight: 580; letter-spacing: -0.012em; transition: color .2s; }
+.list a:hover .t { color: var(--accent); }
+.s { display: block; margin-top: 6px; font-size: 14.5px; color: var(--muted); }
+.li-meta { display: flex; align-items: center; gap: 14px; margin-top: 9px; font-size: 12px; color: var(--faint); }
+.li-meta time { font-variant-numeric: tabular-nums; }
+.tags { color: var(--muted); }
+.min { margin-left: auto; }
+.log .t { font-size: 18px; font-weight: 540; color: var(--text); }
+.log .s { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.log a:hover .t { color: var(--accent); }
+
+.empty { margin: 10px 0 0; font-size: 14px; color: var(--faint); }
+.more {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 18px;
+  font-size: 13px; color: var(--muted); text-decoration: none; transition: color .18s, gap .18s;
 }
-.brand { font-weight: 700; color: var(--text); }
-.nav { display: flex; gap: 16px; font-size: 0.9rem; }
+.more svg { width: 13px; height: 13px; }
+.more:hover { color: var(--accent); gap: 10px; }
 
-.site-footer {
-  border-top: 1px solid var(--border);
-  margin-top: 64px;
-  padding-block: 24px;
-  color: var(--muted);
-  font-size: 0.85rem;
-  text-align: center;
+/* ── 짧은 글 타임라인 (개인 공부 / 실무 학습) ──────────── */
+.log-entry { border-left: 2px solid var(--hair); padding: 0 0 28px 20px; margin-left: 4px; }
+.log-entry time { display: block; font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.log-entry h3 {
+  display: block; margin: 2px 0 6px; font-size: 18px; font-weight: 580;
+  letter-spacing: -0.012em; text-transform: none; color: var(--text);
 }
+.log-body { color: var(--muted); font-size: 14.5px; }
+.log-body p { margin: 0 0 10px; }
 
-main { padding-block: 40px; }
-
-/* 배지 — README의 shields.io 느낌 */
-.badges { display: flex; flex-wrap: wrap; gap: 6px; }
-.badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 4px;
-  background: var(--accent-soft);
-  color: #fff;
-  font-size: 0.75rem;
-  letter-spacing: 0.02em;
+/* ── 일기 달력 ────────────────────────────────────────── */
+/* 한 줄에 두 달씩 — 9·10 / 11·12 */
+.cal-year {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px 44px; max-width: 620px;
 }
-
-/* 카드 */
-.cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-.card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  padding: 16px 18px;
+.cal-year > .cal { min-width: 0; }
+.cal { margin-bottom: 0; }
+.cal h2 {
+  margin: 0 0 14px; font-size: 12px; font-weight: 500; letter-spacing: .06em;
+  color: var(--faint); font-variant-numeric: tabular-nums;
 }
-.card h3 { margin: 0 0 6px; font-size: 1rem; }
-.card p { margin: 0 0 10px; color: var(--muted); font-size: 0.88rem; }
-
-/* 목록 */
-.entry-list { list-style: none; margin: 0; padding: 0; }
-.entry-list li {
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  gap: 14px;
-  align-items: baseline;
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px 0; max-width: 340px; }
+.cal-year .cal-grid { max-width: none; }
+.cal-head {
+  text-align: center; font-size: 11px; color: var(--faint);
+  padding-bottom: 8px; font-weight: 400;
 }
-.entry-list time { color: var(--muted); font-size: 0.8rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
-
-/* 일기 타임라인 */
-.log-entry {
-  border-left: 2px solid var(--border);
-  padding: 0 0 24px 20px;
-  margin-left: 6px;
+/* 테두리도 상자도 없다 — 숫자만. 글이 있는 날은 아래 점 하나로 표시한다. */
+.cal-cell {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  /* min-width 을 풀어주지 않으면 두 자리 숫자가 칸보다 넓어져 달력이 옆 칸을 침범한다 */
+  min-width: 0; aspect-ratio: 1; font-size: 13px; color: var(--faint);
+  font-variant-numeric: tabular-nums; text-decoration: none;
+  transition: color .18s;
 }
-.log-entry h3 { margin: 0 0 4px; font-size: 0.98rem; }
-.log-entry .log-body { color: var(--muted); font-size: 0.9rem; }
+.cal-cell:hover { color: var(--accent); }
+.cal-cell.empty { visibility: hidden; }
+.cal-cell.has { color: var(--text); font-weight: 600; }
+.cal-cell.has::after {
+  content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
+  width: 3px; height: 3px; border-radius: 50%; background: var(--accent);
+}
+.cal-cell.has:hover { color: var(--accent); }
 
-/* 글 본문 */
-.prose { font-size: 0.96rem; }
+/* ── 글 본문 ──────────────────────────────────────────── */
+.prose { font-size: 15.5px; }
 .prose img { max-width: 100%; }
 .prose pre {
-  background: #17110e;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px;
-  overflow-x: auto;
+  background: #ece2d8; border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px; overflow-x: auto;
 }
-.prose code { font-size: 0.88em; }
-.prose blockquote {
-  border-left: 3px solid var(--accent-soft);
-  margin: 0;
-  padding-left: 14px;
-  color: var(--muted);
+.prose code { font-size: 0.9em; }
+.prose blockquote { border-left: 3px solid var(--accent-soft); margin: 0; padding-left: 14px; color: var(--muted); }
+
+/* ── 푸터 ─────────────────────────────────────────────── */
+.foot { display: flex; align-items: center; gap: 12px; font-size: 12.5px; color: var(--faint); }
+.dots {
+  width: 44px; height: 5px;
+  background-image: radial-gradient(currentColor 1px, transparent 1.4px);
+  background-size: 5px 5px; opacity: .55;
+}
+.foot a { color: var(--faint); }
+
+@media (max-width: 820px) {
+  .cal-year { grid-template-columns: 1fr; }
+  .content { grid-template-columns: 1fr; gap: 34px; padding: 100px 22px 90px; }
+  .t { font-size: 19px; }
+  .side { position: static; flex-direction: row; align-items: center; gap: 16px; }
+  .pfp { flex: none; }
+  .role { margin: 4px 0 8px; }
+  .menu { gap: 16px; }
 }

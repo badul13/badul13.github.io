@@ -13,14 +13,18 @@ const posts = defineCollection({
   }),
 });
 
-// 회사 일기 — 짧게, 고유명사 없이 "무엇을 배웠나" 중심
-const log = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/log' }),
-  schema: z.object({
-    title: z.string(),
-    date: z.coerce.date(),
-    draft: z.boolean().default(false),
-  }),
-});
+const shortForm = (folder) =>
+  defineCollection({
+    loader: glob({ pattern: '**/*.{md,mdx}', base: `./src/content/${folder}` }),
+    schema: z.object({
+      title: z.string(),
+      date: z.coerce.date(),
+      draft: z.boolean().default(false),
+    }),
+  });
 
-export const collections = { posts, log };
+const study = shortForm('study'); // 개인 공부
+const work = shortForm('work');   // 실무 학습
+const diary = shortForm('diary'); // 일기
+
+export const collections = { posts, study, work, diary };
