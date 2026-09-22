@@ -1,0 +1,19 @@
+name = "badul13-write"
+main = "src/index.js"
+compatibility_date = "2026-09-22"
+
+# 비밀이 아닌 설정만 여기 둔다.
+# GITHUB_CLIENT_SECRET 과 SESSION_KEY 는 `wrangler secret put` 으로만 넣는다.
+[vars]
+OWNER = "badul13"
+REPO = "badul13.github.io"
+BRANCH = "main"
+SITE = "https://badul13.github.io"
+ALLOWED_ORIGINS = "https://badul13.github.io"
+
+# 커밋에 박히는 신원. 개인 레포라 사내 메일이 아닌 노리플라이 주소여야 한다.
+COMMIT_NAME = "Taehyeon Jeong"
+COMMIT_EMAIL = "144805932+badul13@users.noreply.github.com"
+
+# 깃허브 App 을 만든 뒤 Client ID 를 여기에 적는다. 공개돼도 되는 값이다.
+GITHUB_CLIENT_ID = "여기에-깃허브-App-Client-ID"
