@@ -20,6 +20,7 @@ const fmt = (d) => d.toISOString().slice(0, 10);
     <p class="muted small" style="margin-top:0">
       <time datetime={fmt(post.data.date)}>{fmt(post.data.date)}</time>
       {post.data.tags.length > 0 && ' · ' + post.data.tags.join(', ')}
+      <a class="edit-link" data-auth href={`/write/?edit=posts/${post.id}`} hidden>수정</a>
     </p>
     <Content />
   </article>

@@ -186,3 +186,12 @@ h3 {
   .role { margin: 4px 0 8px; }
   .menu { gap: 16px; }
 }
+
+/* ── 수정 버튼: 로그인한 브라우저에서만 드러난다 ────────── */
+.edit-link { margin-left: 10px; font-size: 12.5px; color: var(--faint); }
+.edit-link:hover { color: var(--accent); }
+
+/* 제목 줄 오른쪽에 붙는 쓰기 입구 */
+.page-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.page-head h1 { margin-bottom: 0; }
+.page-head + * { margin-top: 28px; }

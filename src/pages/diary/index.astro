@@ -21,7 +21,7 @@ const months = Array.from({ length: 4 }, (_, i) => {
   return { year: YEAR, month, cells };
 });
 
-const written = new Set(entries.map((e) => key(e.data.date)));
+const written = new Map(entries.map((e) => [key(e.data.date), e.id]));
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 ---
 
@@ -37,10 +37,43 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
           {m.cells.map((d) => (
             d === null
               ? <span class="cal-cell empty"></span>
-              : <a class={written.has(key(d)) ? 'cal-cell has' : 'cal-cell'} href={`/diary/${key(d)}/`}>{d.getDate()}</a>
+              : <a
+                  class={written.has(key(d)) ? 'cal-cell has' : 'cal-cell'}
+                  href={`/diary/${key(d)}/`}
+                  data-day={key(d)}
+                  data-entry={written.get(key(d))}
+                >{d.getDate()}</a>
           ))}
         </div>
       </section>
     ))}
   </div>
 </Base>
+
+<script>
+  // 로그인한 브라우저에서만: 한 번 누르면 그 날 보기, 두 번 누르면 쓰기.
+  // 링크를 그대로 두면 첫 클릭에 페이지가 넘어가 두 번째 클릭이 오지 않으므로 잠깐 잡아 둔다.
+  if (localStorage.getItem('gw') === '1') {
+    let pending: ReturnType<typeof setTimeout> | null = null;
+    const cellOf = (event: Event) => (event.target as HTMLElement).closest<HTMLAnchorElement>('.cal-cell[data-day]');
+
+    document.addEventListener('click', (event) => {
+      const cell = cellOf(event);
+      if (!cell) return;
+      event.preventDefault();
+      if (pending) clearTimeout(pending);
+      pending = setTimeout(() => (location.href = cell.href), 220);
+    });
+
+    document.addEventListener('dblclick', (event) => {
+      const cell = cellOf(event);
+      if (!cell) return;
+      event.preventDefault();
+      if (pending) clearTimeout(pending);
+      const entry = cell.dataset.entry;
+      location.href = entry
+        ? `/write/?edit=diary/${entry}`
+        : `/write/?new=diary&date=${cell.dataset.day}`;
+    });
+  }
+</script>

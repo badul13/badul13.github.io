@@ -10,7 +10,10 @@ const readMin = (e) => Math.max(1, Math.round((e.body?.length ?? 0) / 500));
 ---
 
 <Base title="Posts · badul13">
-  <h1>Posts</h1>
+  <div class="page-head">
+    <h1>Posts</h1>
+    <a class="edit-link" data-auth href="/write/?new=posts" hidden>작성</a>
+  </div>
   <ul class="list">
     {posts.map((p) => (
       <li><a href={`/posts/${p.id}/`}>
@@ -24,5 +27,5 @@ const readMin = (e) => Math.max(1, Math.round((e.body?.length ?? 0) / 500));
       </a></li>
     ))}
   </ul>
-  {posts.length === 0 && <p class="empty">아직 글이 없습니다.</p>}
+  {posts.length === 0 && <p class="empty">아직 글 없음</p>}
 </Base>

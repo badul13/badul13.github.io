@@ -13,15 +13,19 @@ const fmt = (d) => d.toISOString().slice(0, 10);
 ---
 
 <Base title="Study · badul13">
-  <h1>Study</h1>
+  <div class="page-head">
+    <h1>Study</h1>
+    <a class="edit-link" data-auth href="/write/?new=study" hidden>작성</a>
+  </div>
   <div style="margin-top:32px">
     {rendered.map(({ entry, Content }) => (
       <div class="log-entry">
         <time class="muted small" datetime={fmt(entry.data.date)}>{fmt(entry.data.date)}</time>
+        <a class="edit-link" data-auth href={`/write/?edit=study/${entry.id}`} hidden>수정</a>
         <h3>{entry.data.title}</h3>
         <div class="log-body"><Content /></div>
       </div>
     ))}
-    {rendered.length === 0 && <p class="muted small">아직 기록이 없습니다.</p>}
+    {rendered.length === 0 && <p class="muted small">아직 기록 없음</p>}
   </div>
 </Base>

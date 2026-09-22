@@ -2,7 +2,7 @@
 import '../styles/global.css';
 
 // 메인(index.astro)과 같은 껍데기를 쓴다 — 네비, 왼쪽 프로필, 본문 폭, 푸터가 전부 같다.
-const { title, description = '' } = Astro.props;
+const { title, description = '', noindex = false } = Astro.props;
 const nav = [
   { href: '/#content', label: 'Home' },
   { href: '/posts', label: 'Posts' },
@@ -20,6 +20,7 @@ const active = (href) => href !== '/#content' && path.startsWith(href);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title="posts" href="/rss.xml" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
@@ -55,5 +56,24 @@ const active = (href) => href !== '/#content' && path.startsWith(href);
         </footer>
       </main>
     </div>
+
+    <script>
+      // 쓰기 버튼은 각 섹션 안에 있고, 로그인한 브라우저에서만 드러난다.
+      // 표시가 없는 방문자는 Worker 를 부르지도 않으므로, 남이 보는 화면은 그대로다.
+      import { WRITE_API, WRITE_READY } from '../config/write';
+
+      if (WRITE_READY && localStorage.getItem('gw') === '1') {
+        const token = localStorage.getItem('gw_session');
+        fetch(WRITE_API + '/api/session', {
+          headers: token ? { authorization: 'Bearer ' + token } : {},
+        })
+          .then((response) => {
+            if (!response.ok) return localStorage.removeItem('gw');
+            document.querySelectorAll('[data-auth]').forEach((el) => el.removeAttribute('hidden'));
+            document.documentElement.dataset.me = '1';
+          })
+          .catch(() => {});
+      }
+    </script>
   </body>
 </html>

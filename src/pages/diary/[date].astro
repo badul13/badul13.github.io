@@ -35,10 +35,13 @@ const Content = entry ? (await render(entry)).Content : null;
   <h1>{date}</h1>
   {entry ? (
     <div class="log-body" style="margin-top:24px">
-      <h2>{entry.data.title}</h2>
+      <h2>
+        {entry.data.title}
+        <a class="edit-link" data-auth href={`/write/?edit=diary/${entry.id}`} hidden>수정</a>
+      </h2>
       <Content />
     </div>
   ) : (
-    <p class="muted small" style="margin-top:24px">이 날은 기록이 없습니다.</p>
+    <p class="muted small" style="margin-top:24px">이 날은 기록 없음</p>
   )}
 </Base>
