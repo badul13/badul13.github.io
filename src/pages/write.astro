@@ -1,0 +1,947 @@
+---
+import Base from '../layouts/Base.astro';
+import { COLLECTIONS } from '../config/write';
+
+// 이 페이지는 빌드에 포함되지만, 로그인하지 않으면 작성 칸이 나오지 않는다.
+// 즉 가려서 감추는 게 아니라 권한으로 막는다. 검색에는 안 걸리게 해 둔다.
+//
+// 새 글은 여기서 쓰고, 기존 글은 그 글에 붙은 수정 버튼으로 ?edit= 을 달고 들어온다.
+
+---
+
+<Base title="Write" noindex>
+  <p id="boot" class="muted small">확인 중…</p>
+
+  <div id="setup" class="wr-note" hidden>
+    <b>Worker 주소 미설정</b>
+    <p><code>worker/</code> 배포 후 받은 주소를 <code>src/config/write.ts</code> 에 입력</p>
+  </div>
+
+  <div id="gate" hidden>
+    <h1>Write</h1>
+    <p class="muted small">작성하려면 깃허브 로그인 필요</p>
+    <a id="login" class="wr-btn" href="#">GitHub 로 로그인</a>
+  </div>
+
+  <div id="editor" hidden>
+    <div class="wr-top">
+      <h1 id="heading">Write</h1>
+      <span class="muted small">
+        <span id="who"></span>
+        <button id="logout" class="wr-link" type="button">로그아웃</button>
+      </span>
+    </div>
+
+    <div class="wr-row wr-lead">
+      <label class="wr-field">
+        <span>작성 위치</span>
+        <select id="collection">
+          {COLLECTIONS.map((c) => <option value={c.id}>{c.label}</option>)}
+        </select>
+      </label>
+      <label class="wr-field wr-title">
+        <span>제목</span>
+        <input id="title" type="text" autocomplete="off" placeholder="제목" />
+      </label>
+    </div>
+
+    <div class="wr-tabs">
+      <button id="tab-write" class="on" type="button">본문</button>
+      <button id="tab-preview" type="button">미리보기</button>
+    </div>
+    <div id="tools" class="wr-tools">
+      <button type="button" data-md="h2">H2</button>
+      <button type="button" data-md="h3">H3</button>
+      <span class="wr-tools-gap"></span>
+      <button type="button" data-md="bold" title="굵게"><b>B</b></button>
+      <button type="button" data-md="italic" title="기울임"><i>I</i></button>
+      <button type="button" data-md="strike" title="취소선"><s>S</s></button>
+      <span class="wr-tools-gap"></span>
+      <button type="button" data-md="code">코드</button>
+      <button type="button" data-md="pre">코드블록</button>
+      <button type="button" data-md="quote">인용</button>
+      <span class="wr-tools-gap"></span>
+      <button type="button" data-md="ul">목록</button>
+      <button type="button" data-md="ol">번호</button>
+      <button type="button" data-md="task">체크</button>
+      <span class="wr-tools-gap"></span>
+      <span class="wr-tool-wrap">
+        <button id="table-open" type="button">표</button>
+        <div id="table-pick" class="wr-table-pick" hidden>
+          <div id="table-grid" class="wr-table-grid"></div>
+          <span id="table-size" class="wr-table-size"></span>
+        </div>
+      </span>
+    </div>
+    <textarea id="body" rows="22" spellcheck="false"></textarea>
+    <div id="preview" class="prose wr-preview" hidden></div>
+
+    <details class="wr-more">
+      <summary>발행 설정</summary>
+      <div class="wr-more-in">
+        <div class="wr-row">
+          <div class="wr-field">
+            <span>날짜</span>
+            <div class="wr-date">
+              <button id="date-open" class="wr-date-value" type="button"></button>
+              <div id="picker" class="wr-picker" hidden>
+                <div class="wr-picker-head">
+                  <button id="prev" type="button" aria-label="이전 달">‹</button>
+                  <span id="month"></span>
+                  <button id="next" type="button" aria-label="다음 달">›</button>
+                </div>
+                <div id="grid" class="wr-picker-grid"></div>
+                <button id="today" class="wr-picker-today" type="button">오늘</button>
+              </div>
+            </div>
+          </div>
+          <label class="wr-field" id="tags-field">
+            <span>태그</span>
+            <input id="tags" type="text" autocomplete="off" placeholder="astro, blog" />
+          </label>
+        </div>
+
+        <label class="wr-field" id="summary-field">
+          <span>요약</span>
+          <input id="summary" type="text" autocomplete="off" placeholder="한 줄 요약" />
+        </label>
+
+        <label class="wr-field">
+          <span>커밋 메시지</span>
+          <input id="message" type="text" autocomplete="off" spellcheck="false" />
+        </label>
+      </div>
+    </details>
+
+    <div class="wr-actions">
+      <button id="save" class="wr-btn" type="button">저장하고 푸시</button>
+    </div>
+    <p id="status" class="wr-status"></p>
+  </div>
+</Base>
+
+<style>
+  .wr-note {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 14px;
+  }
+  .wr-note p { margin: 8px 0 0; color: var(--muted); }
+
+  .wr-top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+  .wr-top h1 { margin-bottom: 20px; }
+
+  .wr-field { display: block; margin: 0 0 16px; }
+  .wr-field > span {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 11.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 600;
+  }
+  .wr-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  /* 글쓰기 화면은 제목과 본문이 차지한다. 나머지는 발행 설정으로 내린다. */
+  .wr-lead { grid-template-columns: 170px minmax(0, 1fr); }
+
+  .wr-more { margin-top: 22px; border-top: 1px solid var(--hair); }
+  .wr-more > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 14px 0;
+    font-size: 11.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 600;
+  }
+  .wr-more > summary::-webkit-details-marker { display: none; }
+  .wr-more > summary::before { content: '+'; margin-right: 9px; }
+  .wr-more[open] > summary::before { content: '−'; }
+  .wr-more > summary:hover { color: var(--accent); }
+
+  input[type='text'],
+  select,
+  textarea,
+  .wr-date-value {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+  }
+  input:focus, select:focus, textarea:focus, .wr-date-value:focus {
+    outline: none;
+    border-color: var(--accent-soft);
+  }
+  textarea {
+    line-height: 1.8;
+    resize: vertical;
+    min-height: 420px;
+  }
+  textarea::placeholder { color: var(--faint); }
+
+  /* 날짜 — 브라우저 기본 달력은 테마를 못 씌워서 직접 그린다. 일기 달력과 같은 결. */
+  .wr-date { position: relative; }
+  .wr-date-value { text-align: left; cursor: pointer; font-variant-numeric: tabular-nums; }
+  .wr-picker {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 268px;
+    padding: 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(59, 42, 36, 0.13);
+  }
+  .wr-picker-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .wr-picker-head button {
+    background: none;
+    border: none;
+    padding: 0 8px;
+    font: inherit;
+    font-size: 17px;
+    line-height: 1;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .wr-picker-head button:hover { color: var(--accent); }
+  /* 날짜 칸은 스크립트가 그려 넣는다 — 스코프 스타일이 안 붙으므로 :global 로 쓴다. */
+  .wr-picker-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px 0; }
+  .wr-picker-grid :global(span),
+  .wr-picker-grid :global(button) {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .wr-picker-grid :global(span) { color: var(--faint); font-size: 11px; }
+  .wr-picker-grid :global(button) {
+    background: none;
+    border: none;
+    border-radius: 6px;
+    font-family: inherit;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .wr-picker-grid :global(button:hover) { color: var(--accent); background: var(--surface); }
+  .wr-picker-grid :global(button.on) { background: var(--accent); color: var(--bg); font-weight: 600; }
+  .wr-picker-grid :global(button.blank) { visibility: hidden; }
+  .wr-picker-today {
+    margin: 10px 0 0;
+    width: 100%;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--hair);
+    padding: 9px 0 0;
+    font: inherit;
+    font-size: 12.5px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .wr-picker-today:hover { color: var(--accent); }
+
+  .wr-tabs { display: flex; align-items: baseline; gap: 14px; margin: 4px 0 9px; }
+  .wr-tabs button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 13px;
+    color: var(--faint);
+    cursor: pointer;
+  }
+  .wr-tabs button.on { color: var(--accent); font-weight: 600; }
+
+  .wr-tools {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-bottom: 8px;
+    padding: 5px 6px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+  .wr-tools button {
+    background: none;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 9px;
+    font: inherit;
+    font-size: 12.5px;
+    line-height: 1.2;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .wr-tools button:hover { color: var(--accent); background: var(--bg); }
+  .wr-tools button b, .wr-tools button i, .wr-tools button s { font-size: 13px; }
+  .wr-tools-gap { width: 1px; height: 15px; margin: 0 6px; background: var(--border); }
+
+  /* 표 — 한글처럼 칸을 끌어 고른다. */
+  .wr-tool-wrap { position: relative; display: inline-flex; }
+  .wr-table-pick {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 6px);
+    left: 0;
+    padding: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(59, 42, 36, 0.13);
+  }
+  .wr-table-grid { display: grid; grid-template-columns: repeat(8, 18px); gap: 3px; }
+  .wr-table-grid :global(i) {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--surface);
+    cursor: pointer;
+  }
+  .wr-table-grid :global(i.on) { border-color: var(--accent); background: var(--accent-soft); }
+  .wr-table-size {
+    display: block;
+    margin-top: 9px;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  textarea.wr-over { border-color: var(--accent); background: var(--bg); }
+
+  .wr-preview {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    min-height: 420px;
+    background: var(--surface);
+  }
+  .wr-preview > :first-child { margin-top: 0; }
+
+  .wr-actions { display: flex; justify-content: flex-end; margin-top: 22px; }
+
+  .wr-btn {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 11px 20px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .wr-btn:hover { background: var(--text); color: var(--bg); }
+  .wr-btn[disabled] { opacity: 0.55; cursor: default; }
+
+  .wr-link { background: none; border: none; padding: 0 0 0 10px; font: inherit; color: var(--accent); cursor: pointer; }
+
+  .wr-status { margin: 14px 0 0; font-size: 13.5px; color: var(--muted); min-height: 1.4em; }
+  .wr-status.bad { color: #a4443a; }
+
+  @media (max-width: 820px) {
+    .wr-row { grid-template-columns: 1fr; gap: 0; }
+  }
+</style>
+
+<script>
+  import { marked } from 'marked';
+  import { WRITE_API, WRITE_READY, COLLECTIONS } from '../config/write';
+
+  const $ = (id: string) => document.getElementById(id)!;
+
+  /**
+   * 세션은 쿠키가 아니라 헤더로 보낸다.
+   * 블로그와 Worker 가 다른 오리진이라 쿠키는 third-party 취급을 받고, 사파리 등에서 막힌다.
+   * 여기 저장되는 값은 서버 키로 봉인된 덩어리라, 안에 든 깃허브 토큰은 브라우저에서 못 읽는다.
+   */
+  const KEY = 'gw_session';
+  let token = localStorage.getItem(KEY);
+
+  async function api(path: string, init: RequestInit = {}) {
+    const headers = new Headers(init.headers);
+    if (token) headers.set('authorization', 'Bearer ' + token);
+    const response = await fetch(WRITE_API + path, { ...init, headers });
+
+    // 토큰이 갱신되면 서버가 새 봉인을 돌려준다.
+    const renewed = response.headers.get('x-session');
+    if (renewed) {
+      token = renewed;
+      localStorage.setItem(KEY, renewed);
+    }
+    return response;
+  }
+
+  const boot = $('boot');
+  const editor = $('editor');
+  const status = $('status');
+  const fields = {
+    collection: $('collection') as HTMLSelectElement,
+    title: $('title') as HTMLInputElement,
+    summary: $('summary') as HTMLInputElement,
+    tags: $('tags') as HTMLInputElement,
+    body: $('body') as HTMLTextAreaElement,
+    message: $('message') as HTMLInputElement,
+  };
+
+  // 고치러 들어온 글. 없으면 새 글이다.
+  let editing: { collection: string; slug: string } | null = null;
+  let sha: string | null = null;
+  let messageTouched = false;
+  // 그 컬렉션에 이미 있는 파일 이름. 새 글 이름이 겹치지 않게 하는 데만 쓴다.
+  let taken = new Set<string>();
+
+  /* ── 날짜 ──────────────────────────────────────────── */
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const key = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+  let picked = new Date();
+  let shown = new Date();
+
+  function drawPicker() {
+    $('month').textContent = `${shown.getFullYear()}. ${pad(shown.getMonth() + 1)}`;
+
+    const first = new Date(shown.getFullYear(), shown.getMonth(), 1).getDay();
+    const days = new Date(shown.getFullYear(), shown.getMonth() + 1, 0).getDate();
+    const cells = [
+      ...WEEKDAYS.map((w) => `<span>${w}</span>`),
+      ...Array.from({ length: first }, () => '<button class="blank" type="button"></button>'),
+      ...Array.from({ length: days }, (_, i) => {
+        const date = new Date(shown.getFullYear(), shown.getMonth(), i + 1);
+        const on = key(date) === key(picked) ? ' on' : '';
+        return `<button class="${on.trim()}" type="button" data-day="${key(date)}">${i + 1}</button>`;
+      }),
+    ];
+    $('grid').innerHTML = cells.join('');
+  }
+
+  function setDate(date: Date) {
+    picked = date;
+    shown = new Date(date.getFullYear(), date.getMonth(), 1);
+    $('date-open').textContent = key(picked);
+    drawPicker();
+    sync();
+  }
+
+  function togglePicker(open: boolean) {
+    $('picker').hidden = !open;
+    if (open) drawPicker();
+  }
+
+  function bindPicker() {
+    $('date-open').addEventListener('click', (event) => {
+      event.stopPropagation();
+      togglePicker($('picker').hidden);
+    });
+    $('picker').addEventListener('click', (event) => {
+      event.stopPropagation();
+      const day = (event.target as HTMLElement).dataset.day;
+      if (!day) return;
+      const [y, m, d] = day.split('-').map(Number);
+      setDate(new Date(y, m - 1, d));
+      togglePicker(false);
+    });
+    $('prev').addEventListener('click', () => {
+      shown = new Date(shown.getFullYear(), shown.getMonth() - 1, 1);
+      drawPicker();
+    });
+    $('next').addEventListener('click', () => {
+      shown = new Date(shown.getFullYear(), shown.getMonth() + 1, 1);
+      drawPicker();
+    });
+    $('today').addEventListener('click', () => {
+      setDate(new Date());
+      togglePicker(false);
+    });
+    document.addEventListener('click', () => togglePicker(false));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') togglePicker(false);
+    });
+  }
+
+  /* ── 이름과 메시지 ─────────────────────────────────── */
+
+  /**
+   * 파일 이름은 사람이 정하지 않는다. 날짜와 제목에서 만들고, 겹치면 번호를 붙인다.
+   * 한글 제목은 슬러그로 남는 글자가 없으므로 날짜만 남는다.
+   */
+  function baseName() {
+    const date = key(picked);
+    if (fields.collection.value === 'diary') return date;
+
+    const ascii = fields.title.value
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .slice(0, 60)
+      .replace(/^-+|-+$/g, '');
+    return ascii.length >= 3 ? `${date}-${ascii}` : date;
+  }
+
+  function fileName() {
+    if (editing) return editing.slug;
+    const base = baseName();
+    if (!taken.has(base)) return base;
+    for (let n = 2; ; n++) if (!taken.has(`${base}-${n}`)) return `${base}-${n}`;
+  }
+
+  function autoMessage() {
+    return `${editing ? 'Update' : 'Add'} ${fields.collection.value}: ${fileName()}`;
+  }
+
+  function sync() {
+    if (!messageTouched) fields.message.value = autoMessage();
+    // 요약과 태그는 posts 스키마에만 있다.
+    const onlyPosts = fields.collection.value !== 'posts';
+    $('summary-field').hidden = onlyPosts;
+    $('tags-field').hidden = onlyPosts;
+  }
+
+  const templateOf = (id: string) => COLLECTIONS.find((c) => c.id === id)?.template ?? '';
+  // 줄바꿈과 공백만 다른 것은 같은 것으로 본다 — 뼈대에 엔터만 몇 번 친 상태도 '안 쓴 글'이다.
+  const bare = (text: string) => text.replace(/\s+/g, ' ').trim();
+
+  /** 손대지 않은 뼈대만 갈아 끼운다. 쓰기 시작한 글은 건드리지 않는다. */
+  function fillTemplate() {
+    const body = bare(fields.body.value);
+    if (body === '' || COLLECTIONS.some((c) => bare(c.template) === body)) {
+      fields.body.value = templateOf(fields.collection.value);
+    }
+  }
+
+  function say(text: string, bad = false) {
+    status.textContent = text;
+    status.classList.toggle('bad', bad);
+  }
+
+  function asNew() {
+    editing = null;
+    sha = null;
+    $('heading').textContent = 'Write';
+    $('save').textContent = '저장하고 푸시';
+    document.title = 'Write';
+  }
+
+  function asEditing(collection: string, slug: string) {
+    editing = { collection, slug };
+    $('heading').textContent = 'Edit';
+    $('save').textContent = '수정 내용 저장';
+    document.title = 'Edit';
+  }
+
+  /** 이름이 겹치는지 보려고 목록만 받아 둔다. 화면에는 나오지 않는다. */
+  async function loadTaken() {
+    taken = new Set();
+    const response = await api('/api/list?collection=' + fields.collection.value);
+    if (!response.ok) return;
+    const { entries } = await response.json();
+    for (const entry of entries) taken.add(entry.slug);
+  }
+
+  /* ── 고치기 ────────────────────────────────────────── */
+
+  /** 프런트매터는 우리가 쓴 모양만 되돌려 읽으면 된다. */
+  function parse(text: string) {
+    const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+    const data: Record<string, string> = {};
+    if (!match) return { data, body: text };
+    for (const line of match[1].split(/\r?\n/)) {
+      const pair = line.match(/^(\w+):\s*(.*)$/);
+      if (pair) data[pair[1]] = pair[2].trim();
+    }
+    return { data, body: text.slice(match[0].length) };
+  }
+
+  const unquote = (value = '') =>
+    value.replace(/^"(.*)"$/, '$1').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+
+  async function openForEdit(collection: string, slug: string) {
+    const response = await api('/api/file?path=' + encodeURIComponent(`src/content/${collection}/${slug}.md`));
+    if (!response.ok) return say('불러오기 실패 · 주소 확인 필요', true);
+
+    const file = await response.json();
+    const { data, body } = parse(file.text);
+
+    asEditing(collection, slug);
+    sha = file.sha;
+    fields.collection.value = collection;
+    fields.title.value = unquote(data.title);
+    fields.summary.value = unquote(data.summary ?? '');
+    fields.tags.value = (data.tags ?? '')
+      .replace(/^\[|\]$/g, '')
+      .split(',')
+      .map((t) => unquote(t.trim()))
+      .filter(Boolean)
+      .join(', ');
+    fields.body.value = body.replace(/^\n+/, '');
+
+    const [y, m, d] = (data.date ?? '').slice(0, 10).split('-').map(Number);
+    if (y) setDate(new Date(y, m - 1, d));
+    else sync();
+  }
+
+  /* ── 저장 ──────────────────────────────────────────── */
+
+  async function save() {
+    const button = $('save') as HTMLButtonElement;
+    const slug = fileName();
+
+    // 일기는 날짜 하나에 하나다. 같은 날짜가 이미 있으면 새로 만들 자리가 없다.
+    if (!editing && fields.collection.value === 'diary' && taken.has(slug)) {
+      return say('그 날짜 일기 존재 · 해당 일기의 수정 버튼 사용', true);
+    }
+
+    button.disabled = true;
+    say('저장 중…');
+
+    const response = await api('/api/save', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        collection: fields.collection.value,
+        slug,
+        title: fields.title.value,
+        date: key(picked),
+        summary: fields.summary.value,
+        tags: fields.tags.value.split(',').map((t) => t.trim()).filter(Boolean),
+        body: fields.body.value,
+        message: fields.message.value,
+        sha,
+      }),
+    });
+
+    const result = await response.json();
+    button.disabled = false;
+
+    if (!response.ok) return say(result.error ?? '저장 실패', true);
+
+    // 저장한 뒤에는 그 글을 고치는 중인 상태가 된다.
+    asEditing(fields.collection.value, slug);
+    sha = result.sha;
+    messageTouched = false;
+    sync();
+
+    status.classList.remove('bad');
+    status.innerHTML =
+      `커밋 완료 · <a href="${result.commit}" target="_blank" rel="noreferrer">커밋 보기</a>` +
+      ' · 배포 후(1분쯤) 사이트에 반영';
+  }
+
+  /* ── 시작 ──────────────────────────────────────────── */
+
+  function bind() {
+    bindPicker();
+
+    fields.collection.addEventListener('change', async () => {
+      // 수정 중에 위치를 옮기면 그 컬렉션의 새 글이 된다. 쓰던 내용은 그대로 둔다.
+      if (editing && editing.collection !== fields.collection.value) asNew();
+      if (!editing) fillTemplate();
+      await loadTaken();
+      sync();
+    });
+    fields.title.addEventListener('input', sync);
+    fields.message.addEventListener('input', () => {
+      messageTouched = true;
+    });
+
+    $('tools').addEventListener('click', (event) => {
+      const kind = (event.target as HTMLElement).closest('button')?.dataset.md;
+      if (kind) applyMd(kind);
+    });
+    bindTable();
+    bindDrop();
+
+    $('tab-write').addEventListener('click', () => showPreview(false));
+    $('tab-preview').addEventListener('click', () => showPreview(true));
+    $('save').addEventListener('click', save);
+    $('logout').addEventListener('click', async () => {
+      await api('/auth/logout', { method: 'POST' });
+      localStorage.removeItem(KEY);
+      localStorage.removeItem('gw');
+      location.href = '/write/';
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+        save();
+      }
+    });
+  }
+
+  /* ── 마크다운 툴바 ─────────────────────────────────── */
+
+  // 고른 글자를 감싸는 것, 줄 앞에 붙는 것, 통째로 끼워 넣는 것 셋이다.
+  const WRAP: Record<string, [string, string]> = {
+    bold: ['**', '**'],
+    italic: ['*', '*'],
+    strike: ['~~', '~~'],
+    code: ['`', '`'],
+  };
+  const PREFIX: Record<string, string> = {
+    h2: '## ',
+    h3: '### ',
+    quote: '> ',
+    ul: '- ',
+    ol: '1. ',
+    task: '- [ ] ',
+  };
+
+  function replaceRange(start: number, end: number, text: string, caret: number) {
+    const area = fields.body;
+    area.value = area.value.slice(0, start) + text + area.value.slice(end);
+    area.focus();
+    area.setSelectionRange(start + caret, start + caret);
+  }
+
+  function applyMd(kind: string) {
+    const { value, selectionStart: from, selectionEnd: to } = fields.body;
+    const picked = value.slice(from, to);
+
+    if (WRAP[kind]) {
+      const [open, close] = WRAP[kind];
+      const text = open + picked + close;
+      return replaceRange(from, to, text, picked ? text.length : open.length);
+    }
+
+    if (PREFIX[kind]) {
+      // 줄 표시는 고른 줄 전체의 맨 앞에 붙어야 한다.
+      const lineStart = value.lastIndexOf('\n', from - 1) + 1;
+      const lineEnd = value.indexOf('\n', to) === -1 ? value.length : value.indexOf('\n', to);
+      const text = value
+        .slice(lineStart, lineEnd)
+        .split('\n')
+        .map((line, i) => (kind === 'ol' ? `${i + 1}. ` : PREFIX[kind]) + line)
+        .join('\n');
+      return replaceRange(lineStart, lineEnd, text, text.length);
+    }
+
+    if (kind === 'pre') {
+      const text = '```js\n' + picked + '\n```';
+      return replaceRange(from, to, text, picked ? text.length : 6);
+    }
+
+  }
+
+  /** 줄을 새로 잡아 통째로 끼워 넣는다. 표와 이미지가 쓴다. */
+  function insertBlock(block: string) {
+    const { value, selectionStart: from, selectionEnd: to } = fields.body;
+    const text = (from === 0 || value[from - 1] === '\n' ? '' : '\n') + block + '\n';
+    replaceRange(from, to, text, text.length);
+  }
+
+  /* ── 표 ────────────────────────────────────────────── */
+
+  const TABLE_MAX = 8;
+  let tableRows = 0;
+  let tableCols = 0;
+
+  function buildTableGrid() {
+    const cells = [];
+    for (let row = 1; row <= TABLE_MAX; row++) {
+      for (let col = 1; col <= TABLE_MAX; col++) cells.push(`<i data-row="${row}" data-col="${col}"></i>`);
+    }
+    $('table-grid').innerHTML = cells.join('');
+  }
+
+  /** 칸을 지웠다 다시 만들면 누르는 도중에 노드가 바뀌어 클릭이 깨진다. 표시만 바꾼다. */
+  function paintTableGrid() {
+    for (const cell of $('table-grid').children as HTMLCollectionOf<HTMLElement>) {
+      const on = Number(cell.dataset.row) <= tableRows && Number(cell.dataset.col) <= tableCols;
+      cell.classList.toggle('on', on);
+    }
+    $('table-size').textContent = tableRows ? `${tableRows} × ${tableCols}` : '칸 고르기';
+  }
+
+  function insertTable(rows: number, cols: number) {
+    const line = (cell: string) => '| ' + Array(cols).fill(cell).join(' | ') + ' |';
+    const table = [line('열'), '|' + ' --- |'.repeat(cols)];
+    for (let i = 1; i < rows; i++) table.push(line(' '));
+    insertBlock(table.join('\n'));
+  }
+
+  function bindTable() {
+    buildTableGrid();
+
+    $('table-open').addEventListener('click', (event) => {
+      event.stopPropagation();
+      const open = $('table-pick').hidden;
+      tableRows = 0;
+      tableCols = 0;
+      paintTableGrid();
+      $('table-pick').hidden = !open;
+    });
+    $('table-pick').addEventListener('click', (event) => event.stopPropagation());
+    $('table-grid').addEventListener('mouseover', (event) => {
+      const cell = event.target as HTMLElement;
+      if (!cell.dataset.row) return;
+      tableRows = Number(cell.dataset.row);
+      tableCols = Number(cell.dataset.col);
+      paintTableGrid();
+    });
+    $('table-grid').addEventListener('click', (event) => {
+      const cell = event.target as HTMLElement;
+      if (!cell.dataset.row) return;
+      insertTable(Number(cell.dataset.row), Number(cell.dataset.col));
+      $('table-pick').hidden = true;
+    });
+    document.addEventListener('click', () => ($('table-pick').hidden = true));
+  }
+
+  /* ── 이미지 ────────────────────────────────────────── */
+
+  /** 끌어다 놓으면 레포에 올리고 그 자리에 마크다운을 넣는다. */
+  function bindDrop() {
+    const area = fields.body;
+
+    area.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      area.classList.add('wr-over');
+    });
+    area.addEventListener('dragleave', () => area.classList.remove('wr-over'));
+
+    area.addEventListener('drop', async (event) => {
+      event.preventDefault();
+      area.classList.remove('wr-over');
+
+      const files = [...(event.dataTransfer?.files ?? [])].filter((f) => f.type.startsWith('image/'));
+      if (!files.length) return;
+
+      for (const file of files) {
+        say(`${file.name} 올리는 중…`);
+        const data = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result).split(',')[1]);
+          reader.readAsDataURL(file);
+        });
+
+        const response = await api('/api/upload', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ name: file.name, type: file.type, data }),
+        });
+        const result = await response.json();
+        if (!response.ok) return say(result.error ?? '이미지 업로드 실패', true);
+
+        insertBlock(`![${file.name.replace(/\.[^.]+$/, '')}](${result.url})`);
+        say(`${file.name} 업로드 완료`);
+      }
+    });
+  }
+
+  function showPreview(on: boolean) {
+    if (on) $('preview').innerHTML = marked.parse(fields.body.value) as string;
+    $('preview').hidden = !on;
+    fields.body.hidden = on;
+    $('tools').hidden = on;
+    $('tab-preview').classList.toggle('on', on);
+    $('tab-write').classList.toggle('on', !on);
+  }
+
+  /** 수정 버튼이 붙여 보내는 ?edit=posts/2026-09-22-something */
+  function editTarget() {
+    const value = new URLSearchParams(location.search).get('edit');
+    if (!value) return null;
+    const [collection, ...rest] = value.split('/');
+    const slug = rest.join('/');
+    const known = COLLECTIONS.some((c) => c.id === collection);
+    return known && /^[\w가-힣.-]+$/.test(slug) ? { collection, slug } : null;
+  }
+
+  /** 각 섹션의 쓰기 버튼이 붙여 보내는 ?new=posts / ?new=diary&date=2026-09-22 */
+  function newTarget() {
+    const params = new URLSearchParams(location.search);
+    const collection = params.get('new');
+    if (!collection || !COLLECTIONS.some((c) => c.id === collection)) return null;
+
+    const day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(params.get('date') ?? '');
+    return {
+      collection,
+      date: day ? new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3])) : null,
+    };
+  }
+
+  /** 로그인하고 돌아오면 봉인된 세션이 조각(#)에 실려 온다. 주소에는 남기지 않는다. */
+  function catchSession() {
+    const match = location.hash.match(/^#s=(.+)$/);
+    if (!match) return;
+    token = decodeURIComponent(match[1]);
+    localStorage.setItem(KEY, token);
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+
+  async function start() {
+    if (!WRITE_READY) {
+      boot.hidden = true;
+      $('setup').hidden = false;
+      return;
+    }
+
+    catchSession();
+    const response = await api('/api/session');
+    boot.hidden = true;
+
+    if (!response.ok) {
+      localStorage.removeItem(KEY);
+      localStorage.removeItem('gw');
+      ($('login') as HTMLAnchorElement).href =
+        WRITE_API + '/auth/login?return=' + encodeURIComponent(location.href);
+      $('gate').hidden = false;
+      return;
+    }
+
+    const me = await response.json();
+    // 이 표시가 있는 브라우저에서만 다른 페이지가 세션을 물어본다.
+    localStorage.setItem('gw', '1');
+    $('who').textContent = me.login;
+    editor.hidden = false;
+    bind();
+    setDate(new Date());
+
+    const target = editTarget();
+    if (target) {
+      fields.collection.value = target.collection;
+      await openForEdit(target.collection, target.slug);
+      return;
+    }
+
+    // 어느 섹션에서 들어왔는지가 곧 작성 위치다. 위에서 바꿀 수는 있다.
+    const fresh = newTarget();
+    if (fresh) {
+      fields.collection.value = fresh.collection;
+      if (fresh.date) setDate(fresh.date);
+    }
+
+    fillTemplate();
+    await loadTaken();
+    sync();
+  }
+
+  start();
+</script>
