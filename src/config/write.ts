@@ -1,6 +1,6 @@
 // /write 화면이 부르는 Worker 주소. 비밀값이 아니라 그냥 주소다.
 // worker/ 를 배포하면 wrangler 가 알려주는 주소를 여기에 적는다.
-export const WRITE_API = 'https://badul13-write.WORKERS-SUBDOMAIN.workers.dev';
+export const WRITE_API = 'https://badul13-write.badul13.workers.dev';
 
 // 주소를 아직 안 채웠으면 화면에서 안내만 띄우고 아무것도 부르지 않는다.
 export const WRITE_READY = !WRITE_API.includes('WORKERS-SUBDOMAIN');
