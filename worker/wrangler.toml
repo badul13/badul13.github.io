@@ -16,4 +16,4 @@ COMMIT_NAME = "Taehyeon Jeong"
 COMMIT_EMAIL = "144805932+badul13@users.noreply.github.com"
 
 # 깃허브 App 을 만든 뒤 Client ID 를 여기에 적는다. 공개돼도 되는 값이다.
-GITHUB_CLIENT_ID = "여기에-깃허브-App-Client-ID"
+GITHUB_CLIENT_ID = "Iv23liOcFk1rhAwJetfU"

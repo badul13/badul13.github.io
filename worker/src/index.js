@@ -82,6 +82,12 @@ async function callback(request, env, url) {
   const state = url.searchParams.get('state');
   const pending = await unseal(env, readCookie(request, STATE_COOKIE));
 
+  // App 설치를 마치면 깃허브가 여기로 되돌려 보낸다. 우리가 시작한 로그인이 아니라
+  // state 가 없으므로 세션을 만들지 않고 작성 화면으로만 보낸다.
+  if (url.searchParams.get('setup_action') && !pending) {
+    return new Response(null, { status: 302, headers: { Location: env.SITE + '/write/' } });
+  }
+
   if (!code || !state || !pending || pending.state !== state) {
     return notice('로그인 상태 불일치 · 다시 시도', 400);
   }
