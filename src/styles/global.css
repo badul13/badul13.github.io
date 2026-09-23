@@ -175,6 +175,15 @@ h3 {
 
 /* ── 글 본문 ──────────────────────────────────────────── */
 .prose { font-size: 15.5px; }
+/* 전역 h3 는 섹션 이름표(작고 연한 대문자)라, 글 안의 제목은 여기서 다시 잡는다.
+   글 제목(h1) 26px 아래로 단계마다 줄이되, 가장 작은 단계도 본문보다는 크고 진하게. */
+.prose :is(h2, h3, h4), .log-body :is(h2, h3, h4) {
+  display: block; color: var(--text); font-weight: 650;
+  letter-spacing: -0.012em; text-transform: none; line-height: 1.4;
+}
+.prose h2, .log-body h2 { margin: 40px 0 14px; font-size: 22px; }
+.prose h3, .log-body h3 { margin: 32px 0 12px; font-size: 18.5px; }
+.prose h4, .log-body h4 { margin: 26px 0 10px; font-size: 16.5px; }
 .prose img { max-width: 100%; }
 .prose pre {
   background: #ece2d8; border: 1px solid var(--border); border-radius: 10px;

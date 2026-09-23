@@ -45,13 +45,10 @@ import { COLLECTIONS } from '../config/write';
       </label>
     </div>
 
-    <div class="wr-tabs">
-      <button id="tab-write" class="on" type="button">본문</button>
-      <button id="tab-preview" type="button">미리보기</button>
-    </div>
     <div id="tools" class="wr-tools">
       <button type="button" data-md="h2">H2</button>
       <button type="button" data-md="h3">H3</button>
+      <button type="button" data-md="h4">H4</button>
       <span class="wr-tools-gap"></span>
       <button type="button" data-md="bold" title="굵게"><b>B</b></button>
       <button type="button" data-md="italic" title="기울임"><i>I</i></button>
@@ -72,9 +69,9 @@ import { COLLECTIONS } from '../config/write';
           <span id="table-size" class="wr-table-size"></span>
         </div>
       </span>
+      <button id="emoji-open" type="button" title="이모지">😎</button>
     </div>
-    <textarea id="body" rows="22" spellcheck="false"></textarea>
-    <div id="preview" class="prose wr-preview" hidden></div>
+    <div id="body" class="wr-editor"></div>
 
     <details class="wr-more">
       <summary>발행 설정</summary>
@@ -165,7 +162,6 @@ import { COLLECTIONS } from '../config/write';
 
   input[type='text'],
   select,
-  textarea,
   .wr-date-value {
     width: 100%;
     background: var(--surface);
@@ -176,16 +172,10 @@ import { COLLECTIONS } from '../config/write';
     font-family: inherit;
     font-size: 15px;
   }
-  input:focus, select:focus, textarea:focus, .wr-date-value:focus {
+  input:focus, select:focus, .wr-date-value:focus {
     outline: none;
     border-color: var(--accent-soft);
   }
-  textarea {
-    line-height: 1.8;
-    resize: vertical;
-    min-height: 420px;
-  }
-  textarea::placeholder { color: var(--faint); }
 
   /* 날짜 — 브라우저 기본 달력은 테마를 못 씌워서 직접 그린다. 일기 달력과 같은 결. */
   .wr-date { position: relative; }
@@ -259,18 +249,6 @@ import { COLLECTIONS } from '../config/write';
   }
   .wr-picker-today:hover { color: var(--accent); }
 
-  .wr-tabs { display: flex; align-items: baseline; gap: 14px; margin: 4px 0 9px; }
-  .wr-tabs button {
-    background: none;
-    border: none;
-    padding: 0;
-    font: inherit;
-    font-size: 13px;
-    color: var(--faint);
-    cursor: pointer;
-  }
-  .wr-tabs button.on { color: var(--accent); font-weight: 600; }
-
   .wr-tools {
     display: flex;
     align-items: center;
@@ -296,6 +274,7 @@ import { COLLECTIONS } from '../config/write';
   .wr-tools button:hover { color: var(--accent); background: var(--bg); }
   .wr-tools button b, .wr-tools button i, .wr-tools button s { font-size: 13px; }
   .wr-tools-gap { width: 1px; height: 15px; margin: 0 6px; background: var(--border); }
+  .wr-tools button.on { color: var(--accent); background: var(--bg); }
 
   /* 표 — 한글처럼 칸을 끌어 고른다. */
   .wr-tool-wrap { position: relative; display: inline-flex; }
@@ -329,16 +308,12 @@ import { COLLECTIONS } from '../config/write';
     text-align: center;
   }
 
-  textarea.wr-over { border-color: var(--accent); background: var(--bg); }
-
-  .wr-preview {
+  .wr-editor {
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 18px 20px;
-    min-height: 420px;
     background: var(--surface);
   }
-  .wr-preview > :first-child { margin-top: 0; }
+  .wr-editor:focus-within { border-color: var(--accent-soft); }
 
   .wr-actions { display: flex; justify-content: flex-end; margin-top: 22px; }
 
@@ -367,8 +342,79 @@ import { COLLECTIONS } from '../config/write';
   }
 </style>
 
+<style is:global>
+  /* 편집기 안쪽과 떠 있는 목록은 스크립트가 만드는 노드라 전역으로 쓴다. 전부 wr- 아래에 둔다. */
+  .wr-doc { min-height: 420px; padding: 18px 20px 40px; outline: none; }
+  .wr-doc > :first-child { margin-top: 0; }
+  .wr-doc p { margin: 0 0 0.9em; }
+  .wr-doc p.is-empty:first-child::before,
+  .wr-doc .is-empty.has-focus::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    color: var(--faint);
+    pointer-events: none;
+  }
+  .wr-doc ul[data-type='taskList'] { list-style: none; padding-left: 4px; }
+  .wr-doc ul[data-type='taskList'] li { display: flex; gap: 8px; align-items: baseline; }
+  .wr-doc ul[data-type='taskList'] li > div { flex: 1; }
+  .wr-doc ul[data-type='taskList'] p { margin: 0; }
+  .wr-doc table { border-collapse: collapse; margin: 12px 0; width: 100%; }
+  .wr-doc th, .wr-doc td { border: 1px solid var(--border); padding: 6px 10px; vertical-align: top; }
+  .wr-doc th { background: var(--bg); font-weight: 600; text-align: left; }
+  .wr-doc th p, .wr-doc td p { margin: 0; }
+  .wr-doc .selectedCell { background: rgba(176, 137, 104, 0.18); }
+  .wr-doc img { max-width: 100%; border-radius: 6px; }
+  .wr-doc img.ProseMirror-selectednode { outline: 2px solid var(--accent-soft); }
+  .wr-doc hr { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+  .wr-doc hr.ProseMirror-selectednode { border-top-color: var(--accent); }
+
+  .wr-pop, .wr-emoji {
+    position: fixed;
+    z-index: 50;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(59, 42, 36, 0.16);
+    font-size: 13.5px;
+  }
+  .wr-pop { width: 220px; max-height: 300px; overflow-y: auto; padding: 5px; }
+  .wr-pop-item {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 6px 8px; border: none; border-radius: 6px; background: none;
+    font: inherit; color: var(--text); text-align: left; cursor: pointer;
+  }
+  .wr-pop-item.on, .wr-pop-item:hover { background: var(--surface); }
+  .wr-pop-item small { margin-left: auto; color: var(--faint); font-size: 11.5px; }
+  .wr-pop-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border: 1px solid var(--border); border-radius: 6px;
+    background: var(--surface); color: var(--muted); font-size: 12px; font-weight: 600;
+  }
+  .wr-pop-emoji .wr-pop-icon { border: none; background: none; font-size: 18px; }
+  .wr-pop-emoji .wr-pop-item span:last-child { color: var(--muted); font-size: 12.5px; }
+  .wr-pop-empty { margin: 8px 10px; color: var(--faint); font-size: 12.5px; }
+
+  .wr-emoji { width: 332px; padding: 10px; }
+  .wr-emoji-search {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px;
+    background: var(--surface); font: inherit; font-size: 13.5px; color: var(--text); outline: none;
+  }
+  .wr-emoji-search:focus { border-color: var(--accent-soft); }
+  .wr-emoji-tabs { display: flex; gap: 2px; margin: 8px 0 6px; padding-bottom: 6px; border-bottom: 1px solid var(--hair); }
+  .wr-emoji-tabs button, .wr-emoji-grid button {
+    border: none; background: none; border-radius: 6px; cursor: pointer; line-height: 1;
+    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+  }
+  .wr-emoji-tabs button { flex: 1; padding: 5px 0; font-size: 16px; opacity: .55; }
+  .wr-emoji-tabs button.on, .wr-emoji-tabs button:hover { opacity: 1; background: var(--surface); }
+  .wr-emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); height: 232px; overflow-y: auto; align-content: start; }
+  .wr-emoji-grid button { height: 36px; font-size: 21px; }
+  .wr-emoji-grid button:hover { background: var(--surface); }
+</style>
+
 <script>
-  import { marked } from 'marked';
+  import { createEditor } from '../scripts/editor';
   import { WRITE_API, WRITE_READY, COLLECTIONS } from '../config/write';
 
   const $ = (id: string) => document.getElementById(id)!;
@@ -403,9 +449,10 @@ import { COLLECTIONS } from '../config/write';
     title: $('title') as HTMLInputElement,
     summary: $('summary') as HTMLInputElement,
     tags: $('tags') as HTMLInputElement,
-    body: $('body') as HTMLTextAreaElement,
     message: $('message') as HTMLInputElement,
   };
+
+  const doc = createEditor($('body'), { onDropImage: uploadImage });
 
   // 고치러 들어온 글. 없으면 새 글이다.
   let editing: { collection: string; slug: string } | null = null;
@@ -527,11 +574,15 @@ import { COLLECTIONS } from '../config/write';
   // 줄바꿈과 공백만 다른 것은 같은 것으로 본다 — 뼈대에 엔터만 몇 번 친 상태도 '안 쓴 글'이다.
   const bare = (text: string) => text.replace(/\s+/g, ' ').trim();
 
+  // 편집기를 거치면 마크다운 모양이 조금 달라지므로, 방금 깔아 둔 뼈대를 편집기 기준으로 기억해 둔다.
+  let untouched = '';
+
   /** 손대지 않은 뼈대만 갈아 끼운다. 쓰기 시작한 글은 건드리지 않는다. */
   function fillTemplate() {
-    const body = bare(fields.body.value);
-    if (body === '' || COLLECTIONS.some((c) => bare(c.template) === body)) {
-      fields.body.value = templateOf(fields.collection.value);
+    const body = doc.getMarkdown();
+    if (bare(body) === '' || body === untouched) {
+      doc.setMarkdown(templateOf(fields.collection.value));
+      untouched = doc.getMarkdown();
     }
   }
 
@@ -599,7 +650,8 @@ import { COLLECTIONS } from '../config/write';
       .map((t) => unquote(t.trim()))
       .filter(Boolean)
       .join(', ');
-    fields.body.value = body.replace(/^\n+/, '');
+    doc.setMarkdown(body);
+    untouched = '';
 
     const [y, m, d] = (data.date ?? '').slice(0, 10).split('-').map(Number);
     if (y) setDate(new Date(y, m - 1, d));
@@ -630,7 +682,7 @@ import { COLLECTIONS } from '../config/write';
         date: key(picked),
         summary: fields.summary.value,
         tags: fields.tags.value.split(',').map((t) => t.trim()).filter(Boolean),
-        body: fields.body.value,
+        body: doc.getMarkdown(),
         message: fields.message.value,
         sha,
       }),
@@ -670,15 +722,23 @@ import { COLLECTIONS } from '../config/write';
       messageTouched = true;
     });
 
+    // 누르는 순간 편집기의 선택이 풀리지 않게 한다.
+    $('tools').addEventListener('mousedown', (event) => {
+      if ((event.target as HTMLElement).closest('button')) event.preventDefault();
+    });
     $('tools').addEventListener('click', (event) => {
       const kind = (event.target as HTMLElement).closest('button')?.dataset.md;
       if (kind) applyMd(kind);
     });
+    doc.editor.on('transaction', paintTools);
     bindTable();
-    bindDrop();
 
-    $('tab-write').addEventListener('click', () => showPreview(false));
-    $('tab-preview').addEventListener('click', () => showPreview(true));
+    $('emoji-open').addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (doc.picker.isOpen) return doc.picker.close();
+      const rect = $('emoji-open').getBoundingClientRect();
+      doc.picker.open({ left: rect.left, bottom: rect.bottom });
+    });
     $('save').addEventListener('click', save);
     $('logout').addEventListener('click', async () => {
       await api('/auth/logout', { method: 'POST' });
@@ -695,65 +755,36 @@ import { COLLECTIONS } from '../config/write';
     });
   }
 
-  /* ── 마크다운 툴바 ─────────────────────────────────── */
+  /* ── 도구 막대 ─────────────────────────────────────── */
 
-  // 고른 글자를 감싸는 것, 줄 앞에 붙는 것, 통째로 끼워 넣는 것 셋이다.
-  const WRAP: Record<string, [string, string]> = {
-    bold: ['**', '**'],
-    italic: ['*', '*'],
-    strike: ['~~', '~~'],
-    code: ['`', '`'],
-  };
-  const PREFIX: Record<string, string> = {
-    h2: '## ',
-    h3: '### ',
-    quote: '> ',
-    ul: '- ',
-    ol: '1. ',
-    task: '- [ ] ',
-  };
-
-  function replaceRange(start: number, end: number, text: string, caret: number) {
-    const area = fields.body;
-    area.value = area.value.slice(0, start) + text + area.value.slice(end);
-    area.focus();
-    area.setSelectionRange(start + caret, start + caret);
-  }
+  const TOOLS: Record<string, { run: () => void; on: () => boolean }> = (() => {
+    const e = doc.editor;
+    const chain = () => e.chain().focus();
+    return {
+      h2: { run: () => chain().toggleHeading({ level: 2 }).run(), on: () => e.isActive('heading', { level: 2 }) },
+      h3: { run: () => chain().toggleHeading({ level: 3 }).run(), on: () => e.isActive('heading', { level: 3 }) },
+      h4: { run: () => chain().toggleHeading({ level: 4 }).run(), on: () => e.isActive('heading', { level: 4 }) },
+      bold: { run: () => chain().toggleBold().run(), on: () => e.isActive('bold') },
+      italic: { run: () => chain().toggleItalic().run(), on: () => e.isActive('italic') },
+      strike: { run: () => chain().toggleStrike().run(), on: () => e.isActive('strike') },
+      code: { run: () => chain().toggleCode().run(), on: () => e.isActive('code') },
+      pre: { run: () => chain().toggleCodeBlock().run(), on: () => e.isActive('codeBlock') },
+      quote: { run: () => chain().toggleBlockquote().run(), on: () => e.isActive('blockquote') },
+      ul: { run: () => chain().toggleBulletList().run(), on: () => e.isActive('bulletList') },
+      ol: { run: () => chain().toggleOrderedList().run(), on: () => e.isActive('orderedList') },
+      task: { run: () => chain().toggleTaskList().run(), on: () => e.isActive('taskList') },
+    };
+  })();
 
   function applyMd(kind: string) {
-    const { value, selectionStart: from, selectionEnd: to } = fields.body;
-    const picked = value.slice(from, to);
-
-    if (WRAP[kind]) {
-      const [open, close] = WRAP[kind];
-      const text = open + picked + close;
-      return replaceRange(from, to, text, picked ? text.length : open.length);
-    }
-
-    if (PREFIX[kind]) {
-      // 줄 표시는 고른 줄 전체의 맨 앞에 붙어야 한다.
-      const lineStart = value.lastIndexOf('\n', from - 1) + 1;
-      const lineEnd = value.indexOf('\n', to) === -1 ? value.length : value.indexOf('\n', to);
-      const text = value
-        .slice(lineStart, lineEnd)
-        .split('\n')
-        .map((line, i) => (kind === 'ol' ? `${i + 1}. ` : PREFIX[kind]) + line)
-        .join('\n');
-      return replaceRange(lineStart, lineEnd, text, text.length);
-    }
-
-    if (kind === 'pre') {
-      const text = '```js\n' + picked + '\n```';
-      return replaceRange(from, to, text, picked ? text.length : 6);
-    }
-
+    TOOLS[kind]?.run();
   }
 
-  /** 줄을 새로 잡아 통째로 끼워 넣는다. 표와 이미지가 쓴다. */
-  function insertBlock(block: string) {
-    const { value, selectionStart: from, selectionEnd: to } = fields.body;
-    const text = (from === 0 || value[from - 1] === '\n' ? '' : '\n') + block + '\n';
-    replaceRange(from, to, text, text.length);
+  /** 커서가 있는 곳의 서식을 도구 막대에 켜 둔다. */
+  function paintTools() {
+    for (const button of $('tools').querySelectorAll<HTMLElement>('[data-md]')) {
+      button.classList.toggle('on', TOOLS[button.dataset.md!]?.on() ?? false);
+    }
   }
 
   /* ── 표 ────────────────────────────────────────────── */
@@ -780,10 +811,7 @@ import { COLLECTIONS } from '../config/write';
   }
 
   function insertTable(rows: number, cols: number) {
-    const line = (cell: string) => '| ' + Array(cols).fill(cell).join(' | ') + ' |';
-    const table = [line('열'), '|' + ' --- |'.repeat(cols)];
-    for (let i = 1; i < rows; i++) table.push(line(' '));
-    insertBlock(table.join('\n'));
+    doc.editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run();
   }
 
   function bindTable() {
@@ -816,52 +844,27 @@ import { COLLECTIONS } from '../config/write';
 
   /* ── 이미지 ────────────────────────────────────────── */
 
-  /** 끌어다 놓으면 레포에 올리고 그 자리에 마크다운을 넣는다. */
-  function bindDrop() {
-    const area = fields.body;
-
-    area.addEventListener('dragover', (event) => {
-      event.preventDefault();
-      area.classList.add('wr-over');
+  /** 끌어다 놓은 이미지를 레포에 올리고 주소를 돌려준다. 넣는 자리는 편집기가 잡는다. */
+  async function uploadImage(file: File) {
+    say(`${file.name} 올리는 중…`);
+    const data = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).split(',')[1]);
+      reader.readAsDataURL(file);
     });
-    area.addEventListener('dragleave', () => area.classList.remove('wr-over'));
 
-    area.addEventListener('drop', async (event) => {
-      event.preventDefault();
-      area.classList.remove('wr-over');
-
-      const files = [...(event.dataTransfer?.files ?? [])].filter((f) => f.type.startsWith('image/'));
-      if (!files.length) return;
-
-      for (const file of files) {
-        say(`${file.name} 올리는 중…`);
-        const data = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(String(reader.result).split(',')[1]);
-          reader.readAsDataURL(file);
-        });
-
-        const response = await api('/api/upload', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ name: file.name, type: file.type, data }),
-        });
-        const result = await response.json();
-        if (!response.ok) return say(result.error ?? '이미지 업로드 실패', true);
-
-        insertBlock(`![${file.name.replace(/\.[^.]+$/, '')}](${result.url})`);
-        say(`${file.name} 업로드 완료`);
-      }
+    const response = await api('/api/upload', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: file.name, type: file.type, data }),
     });
-  }
-
-  function showPreview(on: boolean) {
-    if (on) $('preview').innerHTML = marked.parse(fields.body.value) as string;
-    $('preview').hidden = !on;
-    fields.body.hidden = on;
-    $('tools').hidden = on;
-    $('tab-preview').classList.toggle('on', on);
-    $('tab-write').classList.toggle('on', !on);
+    const result = await response.json();
+    if (!response.ok) {
+      say(result.error ?? '이미지 업로드 실패', true);
+      return null;
+    }
+    say(`${file.name} 업로드 완료`);
+    return { src: result.url as string, alt: file.name.replace(/\.[^.]+$/, '') };
   }
 
   /** 수정 버튼이 붙여 보내는 ?edit=posts/2026-09-22-something */
