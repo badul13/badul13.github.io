@@ -64,9 +64,8 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Taehyeon's blog</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/quiple/galmuri/dist/galmuri.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Recursive:slnt,wght,CASL,CRSV,MONO@-15..0,300..1000,0..1,0..1,0..1&display=swap" />
 </head>
 <body>
   <!-- 배너: 고정. 스크롤해도 움직이지 않고 천천히 사라진다 -->
@@ -243,10 +242,10 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
     /* 배너 = 화면 전체가 모니터 */
     .screen { position:absolute; inset:0; display:none; overflow:hidden;
       padding:7vh 5vw 0; color:#BCAAA4;
-      font-family:'GalmuriMono11','Galmuri11',ui-monospace,monospace; font-size:22px; line-height:2;
-      -webkit-font-smoothing:none; }
+      font-family:'Recursive',ui-monospace,monospace; font-size:22px; line-height:2;
+      font-variation-settings:'MONO' 1, 'CASL' 1; }   /* 고정폭 + 둥근 캐주얼 — 손글씨 제목과 결을 맞춘다 */
     :root[data-banner='code'] .screen { display:block; }
-    .code { margin:0; white-space:pre; opacity:.62; }
+    .code { margin:0; white-space:pre; opacity:.62; font-family:inherit; }   /* pre 는 기본값이 monospace 라 물려받게 한다 */
     .ln  { color:#4E342E; } .kw { color:#D7A86E; } .ann { color:#E0B384; }
     .cls { color:#BCAAA4; } .fn { color:#8D6E63; } .str { color:#7D8471; } .cmt { color:#5D4037; }
     .screen::after { content:''; position:absolute; inset:0; pointer-events:none;
@@ -256,14 +255,14 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
       color:var(--bg);                     /* 블로그 배경색과 같은 값 */
       opacity:calc(1 - var(--pe) * 2.6); }
     .hero-mid h1 { position:relative; margin:0; font-size:clamp(34px, 6vw, 68px); line-height:1.1;
-      font-weight:800; letter-spacing:-0.04em; display:inline-flex; align-items:center; gap:4px; }
+      font-family:'Gloria Hallelujah',cursive; font-weight:400; display:inline-flex; align-items:center; gap:4px; }
     .caret { display:inline-block; width:.055em; height:.82em; background:var(--accent);
-      animation:blink 1.05s steps(1) infinite; }
-    .caret.done { animation:blink 1.05s steps(1) 3; opacity:0; }
-    #c2 { animation-duration:2.1s; }   /* 부제 커서는 주기 두 배 */
+      animation:blink .95s steps(1) infinite; }
+    .caret.done { animation:blink .95s steps(1) 3; opacity:0; }
+    #c2 { animation-duration:1.91s; }   /* 부제 커서는 주기 두 배 */
     @keyframes blink { 50% { opacity:0; } }
-    .hero-mid p { position:relative; margin:18px 0 0; font-size:14px; letter-spacing:.02em; color:#E0B384;
-      font-family:'JetBrains Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+    .hero-mid p { position:relative; margin:18px 0 0; font-size:14px; color:#E0B384;
+      font-family:'Gloria Hallelujah',cursive;
       display:inline-flex; align-items:center; gap:2px; }
 
     .cue { position:absolute; left:50%; bottom:34px; transform:translateX(-50%);

@@ -13,6 +13,18 @@
   --accent-soft: #b08968;
 }
 
+/* 본문용 Recursive. 공백(U+0020, U+00A0)은 범위에서 뺀다 — 고정폭 공백은 한글 띄어쓰기를
+   지나치게 벌리므로, 공백만 다음 글꼴(Pretendard)의 좁은 폭을 쓰게 한다.
+   배너 코드는 들여쓰기가 맞아야 해서 이 글꼴이 아니라 원래 Recursive 를 쓴다. */
+@font-face {
+  font-family: 'Recursive Text';
+  font-style: oblique 0deg 15deg;
+  font-weight: 300 1000;
+  font-display: swap;
+  src: url(https://cdn.jsdelivr.net/npm/@fontsource-variable/recursive@5.3.0/files/recursive-latin-full-normal.woff2) format('woff2-variations');
+  unicode-range: U+0021-007E, U+00A1-00FF, U+0131, U+0152-0153, U+2010-206F, U+20AC, U+2122, U+2212;
+}
+
 * { box-sizing: border-box; }
 
 /* 스크롤바가 있는 페이지와 없는 페이지의 가로 폭이 달라지면 네비가 미묘하게 어긋난다.
@@ -23,7 +35,9 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: Pretendard, -apple-system, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  /* 영문·숫자는 배너와 같은 Recursive Mono Casual, 한글과 공백은 Pretendard 로 넘어간다 */
+  font-family: 'Recursive Text', Pretendard, -apple-system, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  font-variation-settings: 'MONO' 1, 'CASL' 1;
   font-size: 15.5px;
   line-height: 1.75;
   -webkit-font-smoothing: antialiased;
