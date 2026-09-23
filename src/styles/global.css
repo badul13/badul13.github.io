@@ -127,11 +127,15 @@ h3 {
 .more:hover { color: var(--accent); gap: 10px; }
 
 /* ── 짧은 글 타임라인 (개인 공부 / 실무 학습) ──────────── */
-.log-entry { border-left: 2px solid var(--hair); padding: 0 0 28px 20px; margin-left: 4px; }
-.log-entry time { display: block; font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.log-entry { border-left: 2px solid var(--hair); padding: 0 0 28px 20px; margin-left: 4px; scroll-margin-top: 96px; }
+.log-entry time { display: block; margin: 4px 0 16px; font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+/* 제목 줄: 제목 왼쪽, 작성·수정은 오른쪽 끝에 나란히. 작은 글자라 기준선보다 제목 가운데에 맞춘다 */
+.log-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.log-actions { flex: none; display: flex; gap: 12px; }
+.log-actions .edit-link { margin-left: 0; }
 .log-entry h3 {
-  display: block; margin: 2px 0 6px; font-size: 18px; font-weight: 580;
-  letter-spacing: -0.012em; text-transform: none; color: var(--text);
+  display: block; margin: 0; font-size: 22px; font-weight: 620;
+  letter-spacing: -0.015em; text-transform: none; color: var(--text); line-height: 1.35;
 }
 .log-body { color: var(--muted); font-size: 14.5px; }
 .log-body p { margin: 0 0 10px; }
@@ -184,13 +188,17 @@ h3 {
 .prose h2, .log-body h2 { margin: 40px 0 14px; font-size: 22px; }
 .prose h3, .log-body h3 { margin: 32px 0 12px; font-size: 18.5px; }
 .prose h4, .log-body h4 { margin: 26px 0 10px; font-size: 16.5px; }
-.prose img { max-width: 100%; }
-.prose pre {
+/* Study·Work·Diary 목록의 본문(.log-body)도 글 페이지와 같은 모양을 쓴다 */
+.prose img, .log-body img { max-width: 100%; }
+.prose pre, .log-body pre {
   background: #ece2d8; border: 1px solid var(--border); border-radius: 10px;
   padding: 14px; overflow-x: auto;
 }
-.prose code { font-size: 0.9em; }
-.prose blockquote { border-left: 3px solid var(--accent-soft); margin: 0; padding-left: 14px; color: var(--muted); }
+.prose code, .log-body code { font-size: 0.9em; }
+.prose blockquote, .log-body blockquote { border-left: 3px solid var(--accent-soft); margin: 0 0 10px; padding-left: 14px; color: var(--muted); }
+/* .log-body 는 본문이 이미 muted 라 인용은 한 단계 더 연하게 구분한다 */
+.log-body blockquote { color: var(--faint); }
+.log-body blockquote p { margin: 0; }
 
 /* ── 푸터 ─────────────────────────────────────────────── */
 .foot { display: flex; align-items: center; gap: 12px; font-size: 12.5px; color: var(--faint); }

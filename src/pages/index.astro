@@ -32,9 +32,21 @@ const posts = (await getCollection('posts')).filter(live).sort(byDate).slice(0, 
                  m: readMin(e), s: e.data.summary ?? '', href: `/posts/${e.id}/` }));
 
 // 짧은 기록은 갈래별로 최근 것만. 본문 첫 문단을 한 줄 발췌로 같이 보여준다.
-const excerpt = (e) => (e.body ?? '').trim().split(/\n\s*\n/)[0].replace(/\s+/g, ' ');
+// 제목·빈 줄(&nbsp;)·구분선·코드는 건너뛰고, 마크다운 기호는 벗겨서 글자만 남긴다.
+const plain = (text) => text
+  .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+  .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+  .replace(/^\s*(?:>|[-*+]|\d+\.)\s+(?:\[[ xX]\]\s+)?/gm, '')
+  .replace(/[*_~`]+/g, '')
+  .replace(/&nbsp;/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
+const excerpt = (e) => (e.body ?? '').split(/\n\s*\n/)
+  .filter((block) => !/^\s*(#{1,6}\s|&nbsp;\s*$|(?:-{3,}|\*{3,})\s*$|```)/.test(block))
+  .map(plain).find(Boolean) ?? '';
+// 짧은 기록은 따로 페이지가 없으므로 목록 페이지의 그 글 자리로 보낸다.
 const shortForm = async (name) => (await getCollection(name)).filter(live).sort(byDate).slice(0, 3)
-  .map((e) => ({ t: e.data.title, d: fmt(e.data.date), s: excerpt(e) }));
+  .map((e) => ({ t: e.data.title, d: fmt(e.data.date), s: excerpt(e), href: `/${name}/#${e.id}` }));
 const sections = [
   { href: '/study', label: 'Study', note: '개인 공부', items: await shortForm('study') },
   { href: '/work', label: 'Work', note: '실무 학습', items: await shortForm('work') },
@@ -124,7 +136,7 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
           <h3><i class="mk dim"></i>{g.label}<span class="h3-note">{g.note}</span></h3>
           <ul class="list log">
             {g.items.map((e) => (
-              <li><a href={g.href}>
+              <li><a href={e.href}>
                 <span class="t">{e.t}</span>
                 <span class="s">{e.s}</span>
                 <span class="li-meta"><time>{e.d}</time></span>
