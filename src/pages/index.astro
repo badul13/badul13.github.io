@@ -64,6 +64,7 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Taehyeon's blog</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/quiple/galmuri/dist/galmuri.css" />
 </head>
@@ -281,6 +282,9 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
     .side.in { opacity:1; transform:none; }
 
     .content { padding-top:18vh; }
+
+    /* 메인은 섹션 여럿이 한 화면에 이어지므로 서브 페이지(72px)보다 넉넉히 띄운다 */
+    main section { margin-bottom:128px; }
 
     /* 다른 섹션의 첫 글은 목록 여백(위 24px, 왼쪽 20px) 때문에 제목에서 한 칸 떨어져 시작한다.
        달력만 제목에 바로 붙으면 혼자 튀어 보이므로 같은 만큼 들여 쓴다. */

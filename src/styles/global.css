@@ -150,7 +150,8 @@ h3 {
   transition: color .18s;
 }
 .cal-cell:hover { color: var(--accent); }
-.cal-cell.empty { visibility: hidden; }
+/* 빈 목록 문구의 .empty 와 이름이 겹쳐 위 여백 10px 을 물려받으면, 빈 칸이 있는 줄만 벌어진다 */
+.cal-cell.empty { visibility: hidden; margin: 0; }
 .cal-cell.has { color: var(--text); font-weight: 600; }
 .cal-cell.has::after {
   content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
