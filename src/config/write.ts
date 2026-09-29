@@ -45,6 +45,6 @@ export const COLLECTIONS = [
   {
     id: 'diary',
     label: 'Diary',
-    template: ['## 오늘', '', '', '## 메모', ''].join('\n'),
+    template: ['## 회사', '', '', '## 개인 공부', '', '', '## 기타', ''].join('\n'),
   },
 ] as const;
