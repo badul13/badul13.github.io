@@ -56,7 +56,7 @@ const sections = [
 const pad = (n) => String(n).padStart(2, '0');
 const key = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const diaryEntries = (await getCollection('diary')).filter(live).sort(byDate);
-const written = new Set(diaryEntries.map((e) => key(e.data.date)));
+const written = new Map(diaryEntries.map((e) => [key(e.data.date), e.id]));
 const YEAR = new Date().getFullYear();
 const FIRST_MONTH = 8; // 0-based — 9월
 // 칸 수를 6주(42칸)로 맞춰야 달마다 높이가 같아져서 줄이 어긋나지 않는다.
@@ -158,7 +158,12 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
                 {m.cells.map((d) => (
                   d === null
                     ? <span class="cal-cell empty"></span>
-                    : <a class={written.has(key(d)) ? 'cal-cell has' : 'cal-cell'} href={`/diary/${key(d)}/`}>{d.getDate()}</a>
+                    : <a
+                        class={written.has(key(d)) ? 'cal-cell has' : 'cal-cell'}
+                        href={`/diary/${key(d)}/`}
+                        data-day={key(d)}
+                        data-entry={written.get(key(d))}
+                      >{d.getDate()}</a>
                 ))}
               </div>
             </div>
@@ -171,6 +176,10 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
       </footer>
     </main>
   </div>
+
+  <script>
+    import '../scripts/diary-calendar';
+  </script>
 
   <script>
     // 히어로 문구: 제목을 찍고 → 그다음 부제를 찍는다
