@@ -8,7 +8,7 @@
 
 | 갈래 | 위치 | 내용 |
 |---|---|---|
-| Posts | `src/content/posts` | 기술 글 |
+| Post | `src/content/posts` | 기술 글 |
 | Study | `src/content/study` | 개인 공부 기록 |
 | Work | `src/content/work` | 실무 학습 기록 |
 | Diary | `src/content/diary` | 일기 |

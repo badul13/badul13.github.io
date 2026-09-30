@@ -48,8 +48,8 @@ const excerpt = (e) => (e.body ?? '').split(/\n\s*\n/)
 const shortForm = async (name) => (await getCollection(name)).filter(live).sort(byDate).slice(0, 3)
   .map((e) => ({ t: e.data.title, d: fmt(e.data.date), s: excerpt(e), href: `/${name}/#${e.id}` }));
 const sections = [
-  { href: '/study', label: 'Study', note: '개인 공부', items: await shortForm('study') },
-  { href: '/work', label: 'Work', note: '실무 학습', items: await shortForm('work') },
+  { id: 'study', href: '/study', label: 'Study', note: '개인 공부', items: await shortForm('study') },
+  { id: 'work', href: '/work', label: 'Work', note: '실무 학습', items: await shortForm('work') },
 ];
 
 // 일기는 목록이 아니라 달력으로 — /diary 와 같은 모양, 같은 범위(올해 9~12월).
@@ -94,7 +94,7 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
   <header class="nav" id="nav">
     <div class="nav-in">
       <nav class="menu">
-        <a class="on" href="/#content">Home</a><a href="/posts">Posts</a><a href="/study">Study</a><a href="/work">Work</a><a href="/diary">Diary</a>
+        <a class="on" href="/#content">Home</a><a href="/posts">Post</a><a href="/study">Study</a><a href="/work">Work</a><a href="/diary">Diary</a>
       </nav>
     </div>
   </header>
@@ -115,7 +115,7 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
     <main>
       <section>
-        <h3><i class="mk"></i>Posts</h3>
+        <h3><i class="mk"></i>Post<span class="h3-note" data-write="posts">기록</span></h3>
         <ul class="list">
           {posts.map((p) => (
             <li><a href={p.href}>
@@ -133,7 +133,7 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
       {sections.map((g) => (
         <section>
-          <h3><i class="mk dim"></i>{g.label}<span class="h3-note">{g.note}</span></h3>
+          <h3><i class="mk dim"></i>{g.label}<span class="h3-note" data-write={g.id}>{g.note}</span></h3>
           <ul class="list log">
             {g.items.map((e) => (
               <li><a href={e.href}>
@@ -179,6 +179,7 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
   <script>
     import '../scripts/diary-calendar';
+    import '../scripts/section-write';
   </script>
 
   <script>
@@ -305,6 +306,10 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
     /* 메인은 섹션 여럿이 한 화면에 이어지므로 서브 페이지(72px)보다 넉넉히 띄운다 */
     main section { margin-bottom:128px; }
+
+    /* 로그인한 브라우저에서만: 제목 옆 한글이 새 글 쓰기 버튼이 된다 */
+    :root[data-writer] .h3-note[data-write] { cursor:pointer; transition:color .15s, opacity .15s; }
+    :root[data-writer] .h3-note[data-write]:hover { color:var(--accent); opacity:1; }
 
     /* 다른 섹션의 첫 글은 목록 여백(위 24px, 왼쪽 20px) 때문에 제목에서 한 칸 떨어져 시작한다.
        달력만 제목에 바로 붙으면 혼자 튀어 보이므로 같은 만큼 들여 쓴다. */

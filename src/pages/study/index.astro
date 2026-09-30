@@ -22,7 +22,6 @@ const fmt = (d) => d.toISOString().slice(0, 10);
         <div class="log-head">
           <h3>{entry.data.title}</h3>
           <span class="log-actions">
-            <a class="edit-link" data-auth href="/write/?new=study" hidden>작성</a>
             <a class="edit-link" data-auth href={`/write/?edit=study/${entry.id}`} hidden>수정</a>
           </span>
         </div>
@@ -31,10 +30,7 @@ const fmt = (d) => d.toISOString().slice(0, 10);
       </div>
     ))}
     {rendered.length === 0 && (
-      <div class="log-head">
-        <p class="muted small">아직 기록 없음</p>
-        <span class="log-actions"><a class="edit-link" data-auth href="/write/?new=study" hidden>작성</a></span>
-      </div>
+      <p class="muted small">아직 기록 없음</p>
     )}
   </div>
 </Base>

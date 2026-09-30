@@ -14,7 +14,7 @@ export const WRITE_READY = !WRITE_API.includes('WORKERS-SUBDOMAIN');
 export const COLLECTIONS = [
   {
     id: 'posts',
-    label: 'Posts',
+    label: 'Post',
     template: [
       '무엇을 다루는 글인지, 결론이 무엇인지 두어 줄.',
       '',

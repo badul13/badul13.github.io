@@ -9,10 +9,9 @@ const fmt = (d) => d.toISOString().slice(0, 10);
 const readMin = (e) => Math.max(1, Math.round((e.body?.length ?? 0) / 500));
 ---
 
-<Base title="Posts · badul13">
+<Base title="Post · badul13">
   <div class="page-head">
-    <h1>Posts</h1>
-    <a class="edit-link" data-auth href="/write/?new=posts" hidden>작성</a>
+    <h1>Post</h1>
   </div>
   <ul class="list">
     {posts.map((p) => (
