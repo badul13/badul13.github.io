@@ -13,7 +13,7 @@
 | Work | `src/content/work` | 실무 학습 기록 |
 | Diary | `src/content/diary` | 일기 |
 
-- Astro 5로 빌드하고, `main`에 푸시하면 GitHub Actions가 GitHub Pages에 배포합니다.
+- Astro 5로 빌드 / main에 푸시하면 GitHub Actions로 GitHub Pages에 배포
 
 ## 로컬 실행
 
