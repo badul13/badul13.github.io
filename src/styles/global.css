@@ -127,7 +127,7 @@ h3 {
 .more:hover { color: var(--accent); gap: 10px; }
 
 /* ── 짧은 글 타임라인 (개인 공부 / 실무 학습) ──────────── */
-.log-entry { border-left: 2px solid var(--hair); padding: 0 0 28px 20px; margin-left: 4px; scroll-margin-top: 96px; }
+.log-entry { border-left: 2px solid var(--hair); padding: 0 0 58px 20px; margin-left: 4px; scroll-margin-top: 96px; }
 .log-entry time { display: block; margin: 4px 0 16px; font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
 /* 제목 줄: 제목 왼쪽, 작성·수정은 오른쪽 끝에 나란히. 작은 글자라 기준선보다 제목 가운데에 맞춘다 */
 .log-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
