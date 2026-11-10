@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import Profile from '../components/Profile.astro';
 import '../styles/global.css';
 
 const fmt = (d) => d.toISOString().slice(0, 10);
@@ -104,14 +105,7 @@ const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
   <!-- 글: 상자 없이 배경 위에 -->
   <div class="content" id="content">
-    <aside class="side">
-      <img class="pfp" src="/art/avatar.jpg" width="60" height="60" alt="정태현" />
-      <div>
-        <h2>정태현</h2>
-        <p class="role">열심히 하고 싶은 청년</p>
-        <div class="links"><a href="https://github.com/badul13">GitHub</a><span class="dotsep"></span><a href="mailto:badul13@users.noreply.github.com">Mail</a></div>
-      </div>
-    </aside>
+    <Profile />
 
     <main>
       <section>
