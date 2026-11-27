@@ -59,8 +59,11 @@ a:hover { color: var(--text); }
 }
 .nav-in {
   max-width: 1180px; margin: 0 auto; height: 68px; padding: 0 32px;
-  display: flex; align-items: center; justify-content: flex-end; gap: 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
 }
+/* 블로그 → 포트폴리오 입구 */
+.nav-home { font-family: 'Gloria Hallelujah', cursive; font-size: 17px; color: var(--muted); }
+.nav-home:hover { color: var(--accent); }
 .menu { display: flex; gap: 24px; }
 .menu a { color: var(--muted); text-decoration: none; font-size: 13.5px; transition: color .18s; }
 .menu a:hover { color: var(--text); }
@@ -227,3 +230,12 @@ h3 {
 .page-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
 .page-head h1 { margin-bottom: 0; }
 .page-head + * { margin-top: 28px; }
+
+/* ── 블로그 입구(/blog) - 이전 메인 화면 본문 ─────────────── */
+/* 섹션 여럿이 한 화면에 이어져서 서브 페이지(72px)보다 넉넉히 */
+.blog-home section { margin-bottom: 128px; }
+/* 로그인한 브라우저 - 제목 옆 한글이 새 글 쓰기 입구 */
+.h3-note.writable { cursor: pointer; transition: color .15s, opacity .15s; }
+.h3-note.writable:hover { color: var(--accent); opacity: 1; }
+/* 다른 섹션 첫 글의 목록 여백(위 24px, 왼쪽 20px)에 맞춘 달력 들여쓰기 */
+.blog-home section .cal-year { margin-top: 24px; padding-left: 20px; }

@@ -13,7 +13,8 @@
 | Work | `src/content/work` | 실무 학습 기록 |
 | Diary | `src/content/diary` | 일기 |
 
-- Astro 5로 빌드 / main에 푸시하면 GitHub Actions로 GitHub Pages에 배포
+- React Router 7(Vite)로 전 주소를 정적 HTML 로 빌드 / main에 푸시하면 GitHub Actions로 GitHub Pages에 배포
+- 포트폴리오 문구는 `app/data/portfolio.ts`
 
 ## 로컬 실행
 

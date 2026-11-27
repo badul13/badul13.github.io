@@ -65,7 +65,7 @@ npx wrangler deploy
 
 ### 4. 블로그에 주소 알려주기
 
-`src/config/write.ts` 의 `WRITE_API` 를 1번에서 받은 주소로 바꾸고 커밋·푸시한다.
+`app/write/config.ts` 의 `WRITE_API` 를 1번에서 받은 주소로 바꾸고 커밋·푸시한다.
 배포가 끝나면 https://badul13.github.io/write/ 에서 로그인 버튼이 보인다.
 
 첫 로그인에서 한 번만 깃허브 승인 화면이 뜨고, 그다음부터는 눌렀을 때 바로 되돌아온다.
