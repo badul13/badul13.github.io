@@ -112,7 +112,7 @@ export default function Home() {
         {/* 04 Work - 실무 (대표) */}
         <section id="work" className="pf-sec">
           <SecTitle id="work" />
-          <p className="sec-lead">회사에서 만든 것 · 제품명과 고객사명은 일반화</p>
+          <p className="sec-lead">회사에서 만든 것</p>
           <div className="cards">
             {work.map((w) => (
               <article className="card" key={w.id}>
@@ -171,9 +171,11 @@ export default function Home() {
                     ))}
                   </ul>
                   <Chips items={s.tags} />
-                  <a className="card-btn" href={s.href} target="_blank" rel="noreferrer">
-                    GitHub <Arrow />
-                  </a>
+                  {s.href && (
+                    <a className="card-btn" href={s.href} target="_blank" rel="noreferrer">
+                      GitHub <Arrow />
+                    </a>
+                  )}
                 </div>
               </article>
             ))}

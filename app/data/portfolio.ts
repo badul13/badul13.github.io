@@ -29,8 +29,8 @@ export const career: Career[] = [
     points: [
       '사내 AI 어시스턴트 - 인수인계 후 백엔드 단독 담당, 프론트 일부',
       '워크플로 에이전트 빌더 - 백엔드 기능 개발',
-      '운영 배포 11회 주관 · 새 운영 서버 이전과 전사 공개',
-      '고객사 현장 설치 · 정부 과제 백엔드 · LLM 서빙 계층',
+      'MCP 기반 외부 도구 연동 · 에이전트 오케스트레이션',
+      '모델 서빙과 GPU · NPU 자원 운영 · 검색 · RAG 파이프라인',
     ],
   },
   { period: '2025.12 ~ 2026.05', title: '인턴', org: '소만사 · 엔드포인트팀', points: [], minor: true },
@@ -42,14 +42,15 @@ export const school = {
   name: '호서대학교 컴퓨터공학부',
   period: '2020.03 ~ 2026.02 졸업',
   gpa: '4.39 / 4.5',
-  extras: ['정보처리기사 (2025.12)', 'LG CNS 기업인증 교과목 우수 성적'],
+  extras: ['정보처리기사 (2025.12)', 'LG CNS 기업인증 교육 수료'],
 };
 
 export const stack: { group: string; items: string[] }[] = [
-  { group: 'Backend', items: ['Java 21', 'Spring Boot', 'Spring Security', 'OIDC / SAML', 'JPA / Hibernate', 'Flyway', 'Python', 'FastAPI'] },
-  { group: 'Data', items: ['MariaDB', 'PostgreSQL', 'MySQL', 'Elasticsearch', 'Redis'] },
-  { group: 'Infra', items: ['Docker Compose', 'Kubernetes (k3s)', 'GitHub Actions', 'AWS EC2 / S3', 'Nginx'] },
-  { group: 'AI Serving', items: ['vLLM', 'NPU (vllm-rbln)', 'MCP'] },
+  { group: 'Languages', items: ['Java', 'Python', 'C++'] },
+  { group: 'AI / Agent', items: ['MCP', 'vLLM'] },
+  { group: 'Backend', items: ['Spring Boot', 'Flask', 'FastAPI'] },
+  { group: 'Data', items: ['MariaDB', 'PostgreSQL', 'Redis', 'Elasticsearch'] },
+  { group: 'Infra', items: ['Linux', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'GitHub Actions'] },
   { group: 'Frontend', items: ['React', 'TypeScript'] },
 ];
 
@@ -560,7 +561,7 @@ export type Side = {
   summary: string;
   tags: string[];
   highlights: string[];
-  href: string;
+  href?: string;
   /** 카드 머리 모니터에 찍을 한 줄 - 명령과 응답 */
   screen: { cmd: string; ok: string };
 };
@@ -577,7 +578,6 @@ export const sideProjects: Side[] = [
       'AOF·RDB 파일과 복제가 실제 Redis 7.2와 섞여 동작 - 서로의 파일을 읽고 서로를 복제',
       '만료된 키가 실제로 언제 지워지는지 같은 내부 동작을 실시간 대시보드로 표시',
     ],
-    href: 'https://github.com/badul13/glass-redis',
     screen: { cmd: 'redis-cli -p 6380 PING', ok: 'PONG' },
   },
   {
@@ -591,7 +591,6 @@ export const sideProjects: Side[] = [
       '로그·커밋·diff·충돌 해결·blame - 임시 저장소를 실제로 만들어 git 동작을 검증하는 테스트',
       '탐색기 우클릭 메뉴와 파일 상태 아이콘은 Rust로 직접 구현',
     ],
-    href: 'https://github.com/badul13/ieummae',
     screen: { cmd: 'ieummae log .', ok: 'opened' },
   },
   {
@@ -605,7 +604,6 @@ export const sideProjects: Side[] = [
       '배경화면에서 위젯이 놓인 자리의 밝기를 재서 밝은·어두운 테마를 스스로 전환',
       '임시 파일에 쓰고 fsync 후 교체하는 저장으로, 강제 종료에도 데이터가 깨지지 않게',
     ],
-    href: 'https://github.com/badul13/desktop-calendar-widget',
     screen: { cmd: 'CalendarWidget.exe', ok: 'pinned' },
   },
 ];
@@ -640,7 +638,6 @@ export const education: School[] = [
     summary: '입력한 정보의 관련 기사를 크롤링해 신뢰도를 내는 챗봇. 클라이언트 - Spring - Flask 데이터 흐름',
     tags: ['Spring Boot', 'Flask', 'MySQL'],
     points: [],
-    href: 'https://github.com/badul13/MixCode/tree/backend',
   },
   {
     title: '동아리 웹사이트 HWH',
@@ -648,7 +645,6 @@ export const education: School[] = [
     summary: '학술 동아리 커뮤니티 - 게시판 · 댓글 · 마이페이지',
     tags: ['Node.js', 'MySQL'],
     points: [],
-    href: 'https://github.com/haewoulhae/hwh',
   },
 ];
 
@@ -667,6 +663,5 @@ export const educationFolded: School[] = [
     summary: '스펙트로그램 + CNN 앙상블로 실제 · 생성 음성 판별',
     tags: ['TensorFlow', 'Python'],
     points: [],
-    href: 'https://github.com/badul13/FakeAudioDetection_practice',
   },
 ];
