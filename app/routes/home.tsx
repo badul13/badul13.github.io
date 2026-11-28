@@ -1,5 +1,6 @@
 // 포트폴리오 첫 화면 - 배너 → 01 About ~ 07 Contact
 // 구성 참고 - 번호 섹션(mjaedot), 맡은 부분이 보이는 카드(namhyebin), 날짜 장치 하나(nykim)
+import { useEffect } from 'react';
 import { Link } from 'react-router';
 import { Hero } from '~/components/Hero';
 import { Chips, PortfolioNav, SecTitle } from '~/components/PortfolioParts';
@@ -39,8 +40,32 @@ function SchoolRow({ s }: { s: School }) {
   );
 }
 
+/** 실무·사이드 카드 전체를 가장 큰 카드 높이로 통일 - 기술 스택은 CSS로 카드 아래 고정 */
+function useEqualCards() {
+  useEffect(() => {
+    const cards = [...document.querySelectorAll<HTMLElement>('.pf .card')];
+    const fit = () => {
+      cards.forEach((c) => (c.style.minHeight = ''));
+      const max = Math.max(...cards.map((c) => c.offsetHeight));
+      cards.forEach((c) => (c.style.minHeight = `${max}px`));
+    };
+    fit();
+    // 폭이 바뀔 때만 다시 잼 - 높이 변화에 반응하면 자기 자신을 다시 부름
+    let width = innerWidth;
+    const ro = new ResizeObserver(() => {
+      if (innerWidth === width) return;
+      width = innerWidth;
+      fit();
+    });
+    ro.observe(document.querySelector('.pf') as Element);
+    document.fonts?.ready.then(fit);
+    return () => ro.disconnect();
+  }, []);
+}
+
 export default function Home() {
   const [lead, ...rest] = education;
+  useEqualCards();
   return (
     <div className="pf-page">
       <Hero />
@@ -52,7 +77,7 @@ export default function Home() {
           <SecTitle id="about" />
           <div className="about">
             <div className="about-card">
-              <img src="/art/avatar.jpg" width={96} height={96} alt={profile.name} />
+              <img src="/art/photo.jpg" width={150} height={210} alt={profile.name} />
               <b>{profile.name}</b>
               <span>{profile.role}</span>
               <a href={profile.github}>github.com/badul13</a>
@@ -65,10 +90,16 @@ export default function Home() {
                 {profile.facts.map((f) => (
                   <div key={f.k}>
                     <dt>{f.k}</dt>
-                    <dd>{f.v}</dd>
+                    <dd>
+                      {f.v}
+                      {f.sub?.map((x) => (
+                        <span className="fact-sub" key={x}> · {x}</span>
+                      ))}
+                    </dd>
                   </div>
                 ))}
               </dl>
+              <p className="about-bio">{profile.bio}</p>
             </div>
           </div>
         </section>
@@ -124,7 +155,10 @@ export default function Home() {
                 </div>
                 <div className="card-body">
                   <span className="card-period">{w.period}</span>
-                  <h3 className="card-title">{w.title}</h3>
+                  <h3 className="card-title">
+                    {w.title}
+                    {w.badge && <span className="badge card-badge">{w.badge}</span>}
+                  </h3>
                   <p className="card-summary">{w.summary}</p>
                   <dl className="card-meta">
                     <dt>맡은 부분</dt>

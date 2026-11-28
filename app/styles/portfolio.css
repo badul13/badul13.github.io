@@ -113,7 +113,7 @@
   padding: 26px 24px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface);
   transform: rotate(-1.6deg); box-shadow: 6px 8px 0 var(--border);
 }
-.about-card img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; }
+.about-card img { width: 150px; height: 210px; border-radius: 6px; object-fit: cover; margin-bottom: 10px; } /* 증명사진 3:4 */
 .about-card b { font-size: 20px; font-weight: 650; }
 .about-card span { font-size: 12px; letter-spacing: .14em; color: var(--muted); }
 .about-card a { margin-top: 6px; font-size: 13px; }
@@ -123,6 +123,8 @@
 .facts div { display: grid; grid-template-columns: 96px 1fr; padding: 12px 0; border-bottom: 1px solid var(--hair); font-size: 14.5px; }
 .facts dt { color: var(--faint); }
 .facts dd { margin: 0; color: var(--text); }
+.facts .fact-sub { color: var(--faint); }
+.about-text .about-bio { margin: 24px 0 0; font-size: 15.5px; line-height: 1.85; color: var(--muted); white-space: pre-line; }
 
 /* 02 Career - 타임라인 */
 .timeline { list-style: none; margin: 0; padding: 0; }
@@ -171,7 +173,11 @@
 .card-body { display: flex; flex-direction: column; gap: 14px; flex: 1; padding: 24px 26px 26px; }
 .card-period { font-size: 12.5px; color: var(--faint); font-variant-numeric: tabular-nums; }
 .card-title { margin: -8px 0 0; font-size: 24px; font-weight: 650; letter-spacing: -.015em; color: var(--text); text-transform: none; display: block; }
-.card-summary { margin: 0; font-size: 14.5px; color: var(--muted); line-height: 1.7; }
+.card-summary {
+  margin: 0; font-size: 14.5px; color: var(--muted); line-height: 1.7;
+  /* 부제는 두 줄 고정 - 한 줄이어도 두 줄 자리, 넘치면 말줄임 */
+  min-height: calc(2 * 1.7em); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
 .card-meta { display: flex; gap: 12px; margin: 0; padding: 10px 14px; border-radius: 8px; background: var(--bg); font-size: 13.5px; }
 .card-meta dt { flex: none; color: var(--accent); font-weight: 600; }
 .card-meta dd { margin: 0; color: var(--text); }
@@ -185,7 +191,8 @@
 }
 .card-btn svg { width: 14px; height: 14px; }
 .card-btn:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--text); background: var(--text); color: var(--bg); }
-.card .chips { margin-bottom: 6px; }
+.card .chips { margin-top: auto; margin-bottom: 6px; } /* 핵심 줄 수와 상관없이 카드 아래쪽 고정 */
+.card .chips + .card-btn { margin-top: 0; }
 
 /* 06 Education */
 .school {
@@ -208,6 +215,7 @@
   align-self: flex-start; padding: 2px 12px; border-radius: 999px; background: var(--accent); color: var(--bg);
   font-size: 12px; font-weight: 600;
 }
+.card-badge { margin-left: 10px; vertical-align: 4px; letter-spacing: .08em; background: rgba(176, 137, 104, .18); color: var(--accent); } /* 연한 배지 */
 .edu-list { list-style: none; margin: 18px 0 0; padding: 0; }
 .edu-row { display: grid; grid-template-columns: 150px 1fr auto; gap: 32px; align-items: start; padding: 20px 4px; border-bottom: 1px solid var(--hair); }
 .edu-period { font-size: 13.5px; color: var(--faint); font-variant-numeric: tabular-nums; }
